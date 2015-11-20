@@ -9,9 +9,9 @@
 
 ## Projects
 
-* [Common](common) is the project that provides a minimum set of shared features.
-* [Demo](demo) is the template project and the sandbox for solving blocking issues.
-* [Heat-wave](heat-wave) is our own URL Shortener.
+* [Common](https://github.com/MarcosCM/UrlShortener2015/blob/master/common) is the project that provides a minimum set of shared features.
+* [Demo](https://github.com/MarcosCM/UrlShortener2015/blob/master/demo) is the template project and the sandbox for solving blocking issues.
+* [Heat-wave](https://github.com/MarcosCM/UrlShortener2015/blob/master/heat-wave) is our own URL Shortener.
 
 ## Features
 
