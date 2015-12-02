@@ -9,6 +9,7 @@
 <script type="text/javascript"
 	src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="js/app.js">
+
 </script>
 </head>
 <body>
@@ -25,6 +26,31 @@
 						<span class="input-group-btn"><button
 								class="btn btn-lg btn-primary" type="submit">Short me!</button></span>
 					</div>
+				</br>
+					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+						<div class="input-group">
+				 		 <span class="input-group-addon">
+				 			 <input type="checkbox" aria-label="...">
+				 		 </span>
+				 		 <input readonly type="text" class="form-control" value="Este enlace tendrá una previa redicción a publicidad">
+				 	 </div><!-- /input-group -->
+				  </div><!-- /.col-lg-4 -->
+				</br>
+					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+						<div class="input-group">
+						 <span class="input-group-addon">
+							 <input id="checkPersonalizar" onclick="personalizar()" type="checkbox" aria-label="...">
+						 </span>
+						 <input readonly type="text" class="form-control" value="Quiero personalizar mi url acortada">
+					 </div><!-- /input-group -->
+					</div><!-- /.col-lg-4 -->
+<br />
+					<div id="divPersonalizar" style="visibility: hidden;" class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+						<div  class="input-group" >
+						<span  id="divPersonalizar"  class="input-group-addon" id="basic-addon3">localhost:8080/</span>
+					 <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+					</div><!-- /input-group -->
+					</div><!-- /.col-lg-4 -->
 				</form>
 			</div>
 		</div>

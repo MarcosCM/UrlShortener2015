@@ -22,3 +22,11 @@ $(document).ready(
                 });
             });
     });
+    function personalizar(){
+      if(document.getElementById("checkPersonalizar").checked){
+        document.getElementById("divPersonalizar").style.visibility = "visible";
+s      }
+      else{
+        document.getElementById("divPersonalizar").style.visibility = "hidden";
+      }
+    }
