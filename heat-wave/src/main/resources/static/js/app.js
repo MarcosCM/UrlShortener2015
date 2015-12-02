@@ -28,5 +28,6 @@ $(document).ready(
 s      }
       else{
         document.getElementById("divPersonalizar").style.visibility = "hidden";
+        document.getElementById("urlPerson").value="";
       }
     }
