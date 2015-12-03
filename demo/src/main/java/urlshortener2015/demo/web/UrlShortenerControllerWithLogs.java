@@ -27,10 +27,10 @@ public class UrlShortenerControllerWithLogs extends UrlShortenerController {
 	}
 
 	@Override
-	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,@RequestParam("personalizada") String personalizada,
+	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand, HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
-		return super.shortener(url,personalizada, sponsor, brand, request);
+		return super.shortener(url, sponsor, brand, request);
 	}
 }

@@ -70,12 +70,12 @@ public class UrlShortenerController {
 	}
 
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
-	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,@RequestParam("personalizada") String personalizada,
+	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand,
 			HttpServletRequest request) {
 		ShortURL su = createAndSaveIfValid(url, sponsor, brand, UUID
-				.randomUUID().toString(), extractIP(request),personalizada);
+				.randomUUID().toString(), extractIP(request));
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
@@ -86,15 +86,12 @@ public class UrlShortenerController {
 	}
 
 	protected ShortURL createAndSaveIfValid(String url, String sponsor,
-			String brand, String owner, String ip, String personalizar) {
+			String brand, String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http",
 				"https" });
 		if (urlValidator.isValid(url)) {
-				String id = Hashing.murmur3_32()
+			String id = Hashing.murmur3_32()
 					.hashString(url, StandardCharsets.UTF_8).toString();
-					if(personalizar!=null && !personalizar.equals("")){
-						id=personalizar;
-					}
 			ShortURL su = new ShortURL(id, url,
 					linkTo(
 							methodOn(UrlShortenerController.class).redirectTo(
