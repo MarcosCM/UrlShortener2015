@@ -80,8 +80,7 @@ public class UrlShortenerControllerWithLogs {
 			if(urlconID!=null){
 				//la url personalizada ya existe
 				HttpHeaders h = new HttpHeaders();
-				h.add("Personalizada", "La url a personalizada ya existe");
-
+				h.add("Personalizada", "La URL personalizada ya existe");
 				return new ResponseEntity<>(h,HttpStatus.NOT_ACCEPTABLE);			
 			}
 		}

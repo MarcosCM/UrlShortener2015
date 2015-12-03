@@ -16,7 +16,7 @@ $(document).ready(
                             + "</a></div>");
                     },
                     error : function(request) {
-                      $("#result").html( "<div class='alert alert-danger lead'>Url a acorta errónea</div>");
+                      $("#result").html( "<div class='alert alert-danger lead'>URL a acortar errónea</div>");
                       if(request.getResponseHeader('Personalizada')){
                         $("#result").html(
                                 "<div class='alert alert-danger lead'>"+request.getResponseHeader('Personalizada')+" </div>");
