@@ -20,7 +20,7 @@ apply plugin: 'spring-boot'
 mainClassName = 'urlshortener2015.heatwave.Application'
 
 dependencies {
-    compile project(':common')
+   compile project(':common')
 
     // Provides the production database
     runtime 'org.hsqldb:hsqldb'

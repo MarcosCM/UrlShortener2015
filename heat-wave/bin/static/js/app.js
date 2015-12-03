@@ -15,10 +15,27 @@ $(document).ready(
                             + msg.uri
                             + "</a></div>");
                     },
-                    error : function() {
-                        $("#result").html(
-                                "<div class='alert alert-danger lead'>ERROR</div>");
+                    error : function(request) {
+
+     $("#result").html( "<div class='alert alert-danger lead'>Url a acorta errónea</div>");
+
+if(request.getResponseHeader('Personalizada')){
+     $("#result").html(
+                                "<div class='alert alert-danger lead'>"+request.getResponseHeader('Personalizada')+" </div>");
+}
+
+                   
+
                     }
                 });
             });
     });
+    function personalizar(){
+      if(document.getElementById("checkPersonalizar").checked){
+        document.getElementById("divPersonalizar").style.visibility = "visible";
+s      }
+      else{
+        document.getElementById("divPersonalizar").style.visibility = "hidden";
+        document.getElementById("urlPerson").value="";
+      }
+    }
