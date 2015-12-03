@@ -68,12 +68,12 @@ public class UrlShortenerTests {
 	public void thatShortenerCreatesARedirectIfTheURLisOK() throws Exception {
 		configureTransparentSave();
 
-		mockMvc.perform(post("/link").param("url", "http://example.com/"))
+		mockMvc.perform(post("/link").param("url","personalizada", "http://example.com/"))
 				.andDo(print())
-				.andExpect(redirectedUrl("http://localhost/f684a3c4"))
+				.andExpect(redirectedUrl("http://localhost/personalizada"))
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.hash", is("f684a3c4")))
-				.andExpect(jsonPath("$.uri", is("http://localhost/f684a3c4")))
+				.andExpect(jsonPath("$.hash", is("personalizada")))
+				.andExpect(jsonPath("$.uri", is("http://localhost/personalizada")))
 				.andExpect(jsonPath("$.target", is("http://example.com/")))
 				.andExpect(jsonPath("$.sponsor", is(nullValue())));
 	}
@@ -83,12 +83,12 @@ public class UrlShortenerTests {
 		configureTransparentSave();
 
 		mockMvc.perform(
-				post("/link").param("url", "http://example.com/").param(
+				post("/link").param("url","personalizada", "http://example.com/").param(
 						"sponsor", "http://sponsor.com/")).andDo(print())
-				.andExpect(redirectedUrl("http://localhost/f684a3c4"))
+				.andExpect(redirectedUrl("http://localhost/personalizada"))
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.hash", is("f684a3c4")))
-				.andExpect(jsonPath("$.uri", is("http://localhost/f684a3c4")))
+				.andExpect(jsonPath("$.hash", is("personalizada")))
+				.andExpect(jsonPath("$.uri", is("http://localhost/personalizada")))
 				.andExpect(jsonPath("$.target", is("http://example.com/")))
 				.andExpect(jsonPath("$.sponsor", is("http://sponsor.com/")));
 	}
