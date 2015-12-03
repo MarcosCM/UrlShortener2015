@@ -71,7 +71,7 @@ public class UrlShortenerControllerWithLogs {
 
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
-			@RequestParam("personalizada") String personalizada,
+			@RequestParam(value = "personalizada", required = false) String personalizada,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand, HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
