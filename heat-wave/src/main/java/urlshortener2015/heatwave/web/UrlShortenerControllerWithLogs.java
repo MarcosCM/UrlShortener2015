@@ -79,9 +79,8 @@ public class UrlShortenerControllerWithLogs {
 			ShortURL urlconID = shortURLRepository.findByKey(personalizada);
 			if(urlconID!=null){
 				//la url personalizada ya existe
-				HttpHeaders h = new HttpHeaders();
-				h.add("Personalizada", "La URL personalizada ya existe");
-				return new ResponseEntity<>(h,HttpStatus.NOT_ACCEPTABLE);			
+				throw new Error400Response("La URL a personalizar ya existe");
+							
 			}
 		}
 		ShortURL su = createAndSaveIfValid(url, personalizada, sponsor, brand, UUID.randomUUID().toString(),
@@ -91,7 +90,7 @@ public class UrlShortenerControllerWithLogs {
 			h.setLocation(su.getUri());
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 		} else {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			throw new Error400Response("La URL a acortar no es válida");
 		}
 	}
 
