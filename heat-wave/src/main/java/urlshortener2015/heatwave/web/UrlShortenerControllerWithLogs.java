@@ -56,7 +56,14 @@ public class UrlShortenerControllerWithLogs {
 		h.setLocation(URI.create(l.getTarget()));
 		return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
 	}
-
+	protected ResponseEntity<?> createSuccessfulRedirectToStadistic(ShortURL l) {
+		//En l tienes todos los datos de la shortURL
+		String resultado="Este enlace ha recibido "+clickRepository.clicksByHash(l.getHash())+" clicks";
+		resultado+="</br>La url es " +l.getTarget();
+		resultado+="</br>La fecha de creación es " +l.getCreated().toString();
+		return new ResponseEntity<>(resultado, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
@@ -68,7 +75,17 @@ public class UrlShortenerControllerWithLogs {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-
+	@RequestMapping(value = "/{id:(?!link|index).*}+", method = RequestMethod.GET)
+	public ResponseEntity<?> redirectToEstadisticas(@PathVariable String id, HttpServletRequest request) {
+		logger.info("Requested redirection with hash " + id);
+		ShortURL l = shortURLRepository.findByKey(id);
+		if (l != null) {
+			createAndSaveClick(id, extractIP(request));
+			return createSuccessfulRedirectToStadistic(l);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "personalizada", required = false) String personalizada,
@@ -94,6 +111,7 @@ public class UrlShortenerControllerWithLogs {
 		}
 	}
 
+	
 	protected ShortURL createAndSaveIfValid(String url, String personalizada, String sponsor, String brand,
 			String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
