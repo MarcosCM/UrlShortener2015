@@ -4,9 +4,14 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.UUID;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Response;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -79,8 +84,7 @@ public class UrlShortenerControllerWithLogs {
 			ShortURL urlconID = shortURLRepository.findByKey(personalizada);
 			if(urlconID!=null){
 				//la url personalizada ya existe
-				throw new Error400Response("La URL a personalizar ya existe");
-							
+				throw new Error400Response("La URL a personalizar ya existe");						
 			}
 		}
 		ShortURL su = createAndSaveIfValid(url, personalizada, sponsor, brand, UUID.randomUUID().toString(),
@@ -96,23 +100,36 @@ public class UrlShortenerControllerWithLogs {
 
 	protected ShortURL createAndSaveIfValid(String url, String personalizada, String sponsor, String brand,
 			String owner, String ip) {
+		
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
-
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
 			if (personalizada != null && !personalizada.equals("")) {
 				id = personalizada;
 			}
-			// si ya existe devoler null
-
-				ShortURL su = new ShortURL(id, url,
-						linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(), sponsor,
-						new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
-						null);
-				return shortURLRepository.save(su);
 			
-
-		} else {
+			// Se hace un get de la url a acortar para comprobar que la url no es una redirección sí misma.
+			Client client = ClientBuilder.newClient();
+			Response response = client.target(url).request().get();
+			// Si el código es un 3xx y el Location es 'url' --> es redirección de sí misma.
+			if (response.getStatus() % 100 == 3){
+				try {
+					URI entrada = new URI(url);
+					if (entrada.compareTo(response.getLocation()) == 0)
+						throw new Error400Response("La URL a acortar es redirección de sí misma.");
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			// si ya existe devoler null
+			ShortURL su = new ShortURL(id, url,
+					linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(), sponsor,
+					new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
+					null);
+			return shortURLRepository.save(su);
+		}
+		else {
 			return null;
 		}
 
