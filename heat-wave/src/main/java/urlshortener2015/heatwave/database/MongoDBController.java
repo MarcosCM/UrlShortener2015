@@ -7,7 +7,6 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.mongodb.MongoClient;
@@ -21,16 +20,13 @@ public class MongoDBController implements DatabaseController {
 	
 	private static final Logger log = LoggerFactory
 			.getLogger(MongoDBController.class);
-
-	@Autowired
-	protected MongoTemplate tmpl;
 	
 	/**
      * Conecta con la base de datos si no había conexión previa
      * @return Conexión con la base de datos
      */
     public static MongoTemplate getMongoTemplate(){
-        return getMongoTemplate(false);
+    	return getMongoTemplate(false);
     }
     
     /**
@@ -40,19 +36,19 @@ public class MongoDBController implements DatabaseController {
      * @return Conexión con la base de datos
      */
     public static MongoTemplate getMongoTemplate(boolean forceReload){
-        if (forceReload){
+    	if (forceReload){
         	singleton = null;
         	mongoClient.close();
         	mongoClient = null;
         }
         if (singleton == null){
-            Properties prop = new Properties();
-            try {
-                InputStream in = MongoDBController.class.getResourceAsStream("application.properties");
+        	Properties prop = new Properties();
+        	try {
+        		InputStream in = MongoDBController.class.getResourceAsStream("database.properties");
                 prop.load(in);
                 singleton = connect(prop);
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+            	System.err.println(e.getMessage());
             }
         }
         return singleton;
@@ -68,14 +64,14 @@ public class MongoDBController implements DatabaseController {
      * @throws ClassNotFoundException
      * @throws UnknownHostException
      */
-   private static MongoTemplate connect(Properties prop)
+	private static MongoTemplate connect(Properties prop)
        throws InstantiationException, IllegalAccessException, ClassNotFoundException, UnknownHostException {
-	   String port = prop.getProperty("database.mongo.port", null);
-	   port = port != null ? ":" + port : "";
-	   mongoClient = new MongoClient(prop.getProperty("database.mongo.host") + port);
-	   MongoTemplate tmpl = new MongoTemplate(mongoClient, prop.getProperty("database.mongo.db"));
-	   return tmpl;
-   }
+		String port = prop.getProperty("database.mongo.port", null);
+		port = port != null ? ":" + port : "";
+		mongoClient = new MongoClient(prop.getProperty("database.mongo.host") + port);
+		MongoTemplate tmpl = new MongoTemplate(mongoClient, prop.getProperty("database.mongo.db"));
+		return tmpl;
+   	}
 
 	@Override
 	public ShortURL findByKey(String id) {
