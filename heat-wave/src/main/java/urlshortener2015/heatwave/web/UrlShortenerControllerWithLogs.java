@@ -14,6 +14,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,9 @@ public class UrlShortenerControllerWithLogs {
 
 	@Autowired
 	protected ClickRepository clickRepository;
+	
+	@Autowired
+	private MongoTemplate mongoTemplate;
 
 	protected void createAndSaveClick(String hash, String ip) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()), null, null, null, ip, null);
@@ -75,16 +79,14 @@ public class UrlShortenerControllerWithLogs {
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand, HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
-		if(personalizada != null && !personalizada.equals("")){
+		if (personalizada != null && !personalizada.equals("")){
 			ShortURL urlconID = shortURLRepository.findByKey(personalizada);
-			if(urlconID!=null){
+			if (urlconID != null){
 				//la url personalizada ya existe
 				throw new Error400Response("La URL a personalizar ya existe");
-							
 			}
 		}
-		ShortURL su = createAndSaveIfValid(url, personalizada, sponsor, brand, UUID.randomUUID().toString(),
-				extractIP(request));
+		ShortURL su = createAndSaveIfValid(url, personalizada, sponsor, brand, UUID.randomUUID().toString(), extractIP(request));
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
@@ -94,24 +96,20 @@ public class UrlShortenerControllerWithLogs {
 		}
 	}
 
-	protected ShortURL createAndSaveIfValid(String url, String personalizada, String sponsor, String brand,
-			String owner, String ip) {
+	protected ShortURL createAndSaveIfValid(String url, String personalizada, String sponsor, String brand, String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
-
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
 			if (personalizada != null && !personalizada.equals("")) {
 				id = personalizada;
 			}
-			// si ya existe devoler null
-
-				ShortURL su = new ShortURL(id, url,
-						linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(), sponsor,
-						new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
-						null);
-				return shortURLRepository.save(su);
+			// si ya existe devolver null
 			
-
+			ShortURL su = new ShortURL(id, url,
+					linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(), sponsor,
+					new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
+					null);
+			return shortURLRepository.save(su);
 		} else {
 			return null;
 		}
