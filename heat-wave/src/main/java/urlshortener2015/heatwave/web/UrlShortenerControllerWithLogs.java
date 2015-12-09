@@ -17,11 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.google.common.hash.Hashing;
 
@@ -29,6 +31,7 @@ import urlshortener2015.common.domain.Click;
 import urlshortener2015.common.domain.ShortURL;
 import urlshortener2015.common.repository.ClickRepository;
 import urlshortener2015.common.repository.ShortURLRepository;
+import urlshortener2015.heatwave.Sugerencias;
 
 @RestController
 public class UrlShortenerControllerWithLogs {
@@ -63,7 +66,7 @@ public class UrlShortenerControllerWithLogs {
 		resultado+="</br>La fecha de creación es " +l.getCreated().toString();
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
@@ -96,8 +99,15 @@ public class UrlShortenerControllerWithLogs {
 			ShortURL urlconID = shortURLRepository.findByKey(personalizada);
 			if(urlconID!=null){
 				//la url personalizada ya existe
-				throw new Error400Response("La URL a personalizar ya existe");
-							
+				String SugerenciaSufijo=Sugerencias.sugerenciaSufijos(shortURLRepository, personalizada);
+				String SugerenciaSufijo2=SugerenciaSufijo;
+				while(SugerenciaSufijo2.equals(SugerenciaSufijo)){
+					SugerenciaSufijo2=Sugerencias.sugerenciaSufijos(shortURLRepository, personalizada);
+				}
+				//las recomendaciones se separan con el separador ":"
+			throw new Error400Response("La URL a personalizar ya existe:"+SugerenciaSufijo+":"+SugerenciaSufijo2);
+
+				//return new ResponseEntity<>(urlconID, HttpStatus.BAD_REQUEST);
 			}
 		}
 		ShortURL su = createAndSaveIfValid(url, personalizada, sponsor, brand, UUID.randomUUID().toString(),
@@ -111,7 +121,6 @@ public class UrlShortenerControllerWithLogs {
 		}
 	}
 
-	
 	protected ShortURL createAndSaveIfValid(String url, String personalizada, String sponsor, String brand,
 			String owner, String ip) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
@@ -128,7 +137,7 @@ public class UrlShortenerControllerWithLogs {
 						new Date(System.currentTimeMillis()), owner, HttpStatus.TEMPORARY_REDIRECT.value(), true, ip,
 						null);
 				return shortURLRepository.save(su);
-			
+
 
 		} else {
 			return null;
