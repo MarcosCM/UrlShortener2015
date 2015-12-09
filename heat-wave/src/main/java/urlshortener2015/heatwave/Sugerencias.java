@@ -16,7 +16,7 @@ public class Sugerencias {
 		while(repositorio.findByKey(nombre)!=null){
 			int tamanoSufijo=random.nextInt(intento);
 			if(tamanoSufijo==0)tamanoSufijo++;
-			//60-122
+			//numeros ASCII de 'a-Z' 60-122
 			for(int j=0;j<tamanoSufijo;j++){
 				//generas la siguiente letra del sufijo
 				nombre+=Character.toString ((char) (random.nextInt(122-60)+60));
