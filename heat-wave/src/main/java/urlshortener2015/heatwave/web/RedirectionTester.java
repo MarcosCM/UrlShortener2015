@@ -32,7 +32,7 @@ public class RedirectionTester {
 			for(int i=0; i<=NUM_MAX_REDIRECCIONES; i++){
 				response = client.target(url).request().get();
 				// Si el código es un 3xx
-				if (response.getStatus() % 100 == 3){
+				if (response.getStatus() / 100 == 3){
 					//Alcanzado el límite de redirecciones.
 					if(i == NUM_MAX_REDIRECCIONES){
 
