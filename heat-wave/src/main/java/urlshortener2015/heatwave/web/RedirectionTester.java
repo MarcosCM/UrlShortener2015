@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import urlshortener2015.common.domain.ShortURL;
-import urlshortener2015.common.repository.ShortURLRepository;
+import urlshortener2015.heatwave.entities.ShortURL;
+import urlshortener2015.heatwave.repository.ShortURLRepository;
 
 @Service
 public class RedirectionTester {
@@ -35,7 +35,7 @@ public class RedirectionTester {
 		Response response;
 		
 		// Se obtienen las URLs de la base de datos
-		List<ShortURL> URLS = shortURLRepository.list((long) 0, (long) 0); //Falta saber qué son limit y offset
+		List<ShortURL> URLS = shortURLRepository.findAll(); //Falta saber qué son limit y offset
 		
 		for(ShortURL url : URLS){
 			String urlTarget = url.getTarget();
