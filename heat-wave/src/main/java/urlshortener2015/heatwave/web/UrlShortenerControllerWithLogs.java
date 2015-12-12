@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import javax.ws.rs.client.Client;
@@ -34,6 +35,8 @@ import urlshortener2015.common.domain.Click;
 import urlshortener2015.common.domain.ShortURL;
 import urlshortener2015.common.repository.ClickRepository;
 import urlshortener2015.common.repository.ShortURLRepository;
+import urlshortener2015.heatwave.Sugerencia;
+import urlshortener2015.heatwave.Sugerencias;
 
 @RestController
 public class UrlShortenerControllerWithLogs {
@@ -61,14 +64,15 @@ public class UrlShortenerControllerWithLogs {
 		h.setLocation(URI.create(l.getTarget()));
 		return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
 	}
+
 	protected ResponseEntity<?> createSuccessfulRedirectToStadistic(ShortURL l) {
-		//En l tienes todos los datos de la shortURL
-		String resultado="Este enlace ha recibido "+clickRepository.clicksByHash(l.getHash())+" clicks";
-		resultado+="</br>La url es " +l.getTarget();
-		resultado+="</br>La fecha de creación es " +l.getCreated().toString();
+		// En l tienes todos los datos de la shortURL
+		String resultado = "Este enlace ha recibido " + clickRepository.clicksByHash(l.getHash()) + " clicks";
+		resultado += "</br>La url es " + l.getTarget();
+		resultado += "</br>La fecha de creación es " + l.getCreated().toString();
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
@@ -80,6 +84,25 @@ public class UrlShortenerControllerWithLogs {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
+
+	@RequestMapping(value = "/sugerencias/recomendadas", method = RequestMethod.GET)
+	public ResponseEntity<ArrayList<Sugerencia>> sugerencias(@RequestParam(value = "url", required = false) String url,
+			@RequestParam(value = "personalizada", required = false) String personalizada) {
+		ArrayList<Sugerencia> lista = new ArrayList();
+		if (personalizada != null && !personalizada.equals("") &&
+				shortURLRepository.findByKey(personalizada)!=null) {
+			String SugerenciaSufijo = Sugerencias.sugerenciaSufijos(shortURLRepository, personalizada);
+			String SugerenciaSufijo2 = SugerenciaSufijo;
+			
+			while (SugerenciaSufijo2.equals(SugerenciaSufijo)) {
+				SugerenciaSufijo2 = Sugerencias.sugerenciaSufijos(shortURLRepository, personalizada);
+			}
+			lista.add(new Sugerencia(SugerenciaSufijo2));
+			lista.add(new Sugerencia(SugerenciaSufijo));
+		}
+		return new ResponseEntity<>(lista, HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "/{id:(?!link|index).*}+", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectToEstadisticas(@PathVariable String id, HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
@@ -91,17 +114,27 @@ public class UrlShortenerControllerWithLogs {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
+
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "personalizada", required = false) String personalizada,
 			@RequestParam(value = "sponsor", required = false) String sponsor,
 			@RequestParam(value = "brand", required = false) String brand, HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
-		if(personalizada != null && !personalizada.equals("")){
+		if (personalizada != null && !personalizada.equals("")) {
 			ShortURL urlconID = shortURLRepository.findByKey(personalizada);
-			if(urlconID!=null){
-				//la url personalizada ya existe
-				throw new Error400Response("La URL a personalizar ya existe");						
+			if (urlconID != null) {
+				// la url personalizada ya existe
+				String SugerenciaSufijo = Sugerencias.sugerenciaSufijos(shortURLRepository, personalizada);
+				String SugerenciaSufijo2 = SugerenciaSufijo;
+				while (SugerenciaSufijo2.equals(SugerenciaSufijo)) {
+					SugerenciaSufijo2 = Sugerencias.sugerenciaSufijos(shortURLRepository, personalizada);
+				}
+				// las recomendaciones se separan con el separador ":"
+				throw new Error400Response("La URL a personalizar ya existe:" + SugerenciaSufijo + ":" + SugerenciaSufijo2);
+
+				// return new ResponseEntity<>(urlconID,
+				// HttpStatus.BAD_REQUEST);
 			}
 		}
 		ShortURL su = createAndSaveIfValid(url, personalizada, sponsor, brand, UUID.randomUUID().toString(),
@@ -115,7 +148,6 @@ public class UrlShortenerControllerWithLogs {
 		}
 	}
 
-	
 	protected ShortURL createAndSaveIfValid(String url, String personalizada, String sponsor, String brand,
 			String owner, String ip) {
 		
