@@ -24,8 +24,7 @@ public class ShortURL {
 		this.safe = safe;
 	}
 
-	public ShortURL() {
-	}
+	public ShortURL() {}
 
 	public String getHash() {
 		return hash;
