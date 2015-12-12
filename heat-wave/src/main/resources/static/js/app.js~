@@ -77,7 +77,7 @@ function comprobarSugerencias(input) {
     // esperamos un segundo
     timer = setTimeout(function(){
       //document.getElementById("urlPerson").value=id;
-      $("#sugerencia").html( "<img src='./images/ring.svg' alt='Cargando'></br>");
+    //  $("#sugerencia").html( "<img src='../ring.svg' alt='Cargando'/> </br>");
 
       $.get( "/sugerencias/recomendadas",
         { url: document.getElementById("url").value,
