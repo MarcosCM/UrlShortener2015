@@ -1,7 +1,6 @@
 package urlshortener2015.heatwave.database;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +17,10 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
-import urlshortener2015.heatwave.entities.ShortURL;
-
 @Configuration
 @EnableMongoRepositories(basePackageClasses=urlshortener2015.heatwave.repository.ClickRepository.class)
 @PropertySource(value = { "classpath:database.properties" })
-public class MongoDbController implements DatabaseController {
+public class MongoDbController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MongoDbController.class);
 	
@@ -64,45 +61,5 @@ public class MongoDbController implements DatabaseController {
     public String getDb(){
     	return this.db;
     }
-
-	@Override
-	public ShortURL findByKey(String id) {
-		return null;
-	}
-
-	@Override
-	public ShortURL save(ShortURL su) {
-		return null;
-	}
-
-	@Override
-	public ShortURL mark(ShortURL su, boolean safeness) {
-		return null;
-	}
-
-	@Override
-	public void update(ShortURL su) {
-		
-	}
-
-	@Override
-	public void delete(String hash) {
-		
-	}
-
-	@Override
-	public Long count() {
-		return null;
-	}
-
-	@Override
-	public List<ShortURL> list(Long limit, Long offset) {
-		return null;
-	}
-
-	@Override
-	public List<ShortURL> findByTarget(String target) {
-		return null;
-	}
 
 }
