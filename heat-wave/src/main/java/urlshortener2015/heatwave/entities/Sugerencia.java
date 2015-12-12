@@ -1,4 +1,4 @@
-package urlshortener2015.heatwave;
+package urlshortener2015.heatwave.entities;
 
 public class Sugerencia {
 	

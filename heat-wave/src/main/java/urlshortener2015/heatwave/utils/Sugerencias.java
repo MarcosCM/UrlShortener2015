@@ -1,8 +1,7 @@
-package urlshortener2015.heatwave;
+package urlshortener2015.heatwave.utils;
 
 import java.util.Random;
-import urlshortener2015.common.domain.ShortURL;
-import urlshortener2015.common.repository.ShortURLRepository;
+import urlshortener2015.heatwave.repository.ShortURLRepository;
 
 public class Sugerencias {
 	
@@ -13,28 +12,25 @@ public class Sugerencias {
 		 * Diferentes formas de generar los sufijos de forma aleatoria
 		 */
 		int intento=1;
-		while(repositorio.findByKey(nombre)!=null){
-			int tamanoSufijo=random.nextInt(intento);
-			if(tamanoSufijo==0)tamanoSufijo++;
+		while(repositorio.findByHash(nombre) != null){
+			int tamanoSufijo = random.nextInt(intento);
+			if(tamanoSufijo == 0) tamanoSufijo++;
 			//numeros ASCII de 'a-Z' 60-122
-			for(int j=0;j<tamanoSufijo;j++){
+			for(int j=0; j<tamanoSufijo; j++){
 				//generas la siguiente letra del sufijo
-				nombre+=Character.toString ((char) (random.nextInt(122-60)+60));
+				nombre += Character.toString ((char) (random.nextInt(122-60)+60));
 			}
 			intento++;
 		}
 		
-		
 		return nombre;
-		
 	}
+	
 	public static String SugerenciaSinonimos(ShortURLRepository repositorio, String nombre){
 		String sugerencias= "";
 		
 		
 		
 		return sugerencias;
-		
 	}
-	
 }
