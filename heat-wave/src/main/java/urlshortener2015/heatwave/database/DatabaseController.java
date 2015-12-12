@@ -2,7 +2,7 @@ package urlshortener2015.heatwave.database;
 
 import java.util.List;
 
-import urlshortener2015.common.domain.ShortURL;
+import urlshortener2015.heatwave.entities.ShortURL;
 
 public interface DatabaseController {
 

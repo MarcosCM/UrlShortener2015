@@ -1,4 +1,4 @@
-package urlshortener2015.heatwave.web;
+package urlshortener2015.heatwave.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

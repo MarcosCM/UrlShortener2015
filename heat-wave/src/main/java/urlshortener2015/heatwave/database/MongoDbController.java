@@ -12,14 +12,16 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
-import urlshortener2015.common.domain.ShortURL;
+import urlshortener2015.heatwave.entities.ShortURL;
 
 @Configuration
+@EnableMongoRepositories(basePackageClasses=urlshortener2015.heatwave.repository.ClickRepository.class)
 @PropertySource(value = { "classpath:database.properties" })
 public class MongoDbController implements DatabaseController {
 	
