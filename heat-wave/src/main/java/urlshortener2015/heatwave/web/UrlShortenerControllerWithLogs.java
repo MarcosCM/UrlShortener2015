@@ -130,7 +130,7 @@ public class UrlShortenerControllerWithLogs {
 			Client client = ClientBuilder.newClient();
 			Response response = client.target(url).request().get();
 			// Si el código es un 3xx y el Location es 'url' --> es redirección de sí misma.
-			if (response.getStatus() % 100 == 3){
+			if (response.getStatus() / 100 == 3){
 				try {
 					URI entrada = new URI(url);
 					if (entrada.compareTo(response.getLocation()) == 0)
