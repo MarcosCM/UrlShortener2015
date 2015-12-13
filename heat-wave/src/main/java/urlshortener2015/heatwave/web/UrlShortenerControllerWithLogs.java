@@ -83,7 +83,7 @@ public class UrlShortenerControllerWithLogs {
 			ShortURL su = new ShortURL(id, url,
 					linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(),
 					new Date(System.currentTimeMillis()), HttpStatus.TEMPORARY_REDIRECT.value(), true);
-			return shortURLRepository.save(su);
+			return shortURLRepository.insert(su);
 		}
 		else {
 			return null;
