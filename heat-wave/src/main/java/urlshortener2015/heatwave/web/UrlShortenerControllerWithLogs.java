@@ -51,12 +51,25 @@ public class UrlShortenerControllerWithLogs {
 	@Autowired
 	private ClickRepository clickRepository;
 	
+	/**
+	 * Guarda un click hecho sobre una URL acortada
+	 * @param hash Identificador de la URL (hash o etiqueta)
+	 * @param browser Navegador desde el que se ha hecho click
+	 * @param platform Sistema Operativo/Plataforma desde la que se ha hecho click
+	 * @param ip IP desde la que se ha hecho click
+	 */
 	private void createAndSaveClick(String hash, String browser, String platform, String ip) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()), browser, platform, ip, null);
 		cl = clickRepository.insert(cl);
 		logger.info(cl != null ? "[" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
 	}
 
+	/**
+	 * Crea una URL acortada
+	 * @param url URL a acortar
+	 * @param customTag Etiqueta personalizada
+	 * @return URL acortada en caso de éxito, error en caso contrario
+	 */
 	private ShortURL createAndSaveIfValid(String url, String customTag) {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
@@ -75,7 +88,7 @@ public class UrlShortenerControllerWithLogs {
 					if (entrada.compareTo(response.getLocation()) == 0)
 						throw new Error400Response("La URL a acortar es redirecciÃ³n de sÃ­ misma.");
 				} catch (URISyntaxException e) {
-					e.printStackTrace();
+					throw new Error400Response("La URL a acortar no es válida.");
 				}
 			}
 			
@@ -90,33 +103,55 @@ public class UrlShortenerControllerWithLogs {
 		}
 	}
 	
-	private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
+	/**
+	 * 
+	 * @param url URL acortada
+	 * @return Página de redirección
+	 */
+	private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL url) {
 		HttpHeaders h = new HttpHeaders();
-		h.setLocation(URI.create(l.getTarget()));
-		return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
+		h.setLocation(URI.create(url.getTarget()));
+		return new ResponseEntity<>(h, HttpStatus.valueOf(url.getMode()));
 	}
 
-	private ResponseEntity<?> createSuccessfulRedirectToStadistic(ShortURL l) {
+	/**
+	 * Redirecciona a la página de estadísticas
+	 * @param url URL sobre la que generar las estadísticas
+	 * @return Página de estadísticas
+	 */
+	private ResponseEntity<?> createSuccessfulRedirectToStatistic(ShortURL url) {
 		// En l tienes todos los datos de la shortURL
-		String resultado = "Este enlace ha recibido " + clickRepository.countByHash(l.getHash()) + " clicks";
-		resultado += "</br>La url es " + l.getTarget();
-		resultado += "</br>La fecha de creaciÃ³n es " + l.getDate().toString();
+		String resultado = "Este enlace ha recibido " + clickRepository.countByHash(url.getHash()) + " clicks";
+		resultado += "</br>La url es " + url.getTarget();
+		resultado += "</br>La fecha de creaciÃ³n es " + url.getDate().toString();
 		return new ResponseEntity<>(resultado, HttpStatus.OK);
 	}
 
+	/**
+	 * Redirección de una URL acortada
+	 * @param id Hash o etiqueta de la URL
+	 * @param request Petición
+	 * @return Página de redirección
+	 */
 	@RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
-		ShortURL l = shortURLRepository.findByHash(id);
-		if (l != null) {
+		ShortURL url = shortURLRepository.findByHash(id);
+		if (url != null) {
 			createAndSaveClick(id, HttpServletRequestUtils.getBrowser(request),
 					HttpServletRequestUtils.getPlatform(request), HttpServletRequestUtils.getRemoteAddr(request));
-			return createSuccessfulRedirectToResponse(l);
+			return createSuccessfulRedirectToResponse(url);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
+	/**
+	 * Devuelve sugerencias para una URL personalizada que ya existe
+	 * @param url URL sobre la que se está escribiendo una etiqueta
+	 * @param personalizada Etiqueta para dicha URL
+	 * @return Lista de sugerencias o vacío si la etiqueta no está cogida
+	 */
 	@RequestMapping(value = "/sugerencias/recomendadas", method = RequestMethod.GET)
 	public ResponseEntity<ArrayList<Sugerencia>> sugerencias(@RequestParam(value = "url", required = false) String url,
 			@RequestParam(value = "personalizada", required = false) String personalizada) {
@@ -135,6 +170,12 @@ public class UrlShortenerControllerWithLogs {
 		return new ResponseEntity<>(lista, HttpStatus.OK);
 	}
 
+	/**
+	 * Redirige a la página de estadísticas
+	 * @param id Hash o etiqueta de la URL
+	 * @param request Petición
+	 * @return Página de estadísticas
+	 */
 	@RequestMapping(value = "/{id:(?!link|index).*}+", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectToEstadisticas(@PathVariable String id, HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
@@ -142,17 +183,23 @@ public class UrlShortenerControllerWithLogs {
 		if (l != null) {
 			createAndSaveClick(id, HttpServletRequestUtils.getBrowser(request),
 					HttpServletRequestUtils.getPlatform(request), HttpServletRequestUtils.getRemoteAddr(request));
-			return createSuccessfulRedirectToStadistic(l);
+			return createSuccessfulRedirectToStatistic(l);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
+	/**
+	 * Acorta una URL especificada
+	 * @param url URL a acortar
+	 * @param personalizada Etiqueta personalizada solicitada para la URL
+	 * @param request Petición
+	 * @return Mensaje de éxito o error
+	 */
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "personalizada", required = false) String personalizada,
-			@RequestParam(value = "sponsor", required = false) String sponsor,
-			@RequestParam(value = "brand", required = false) String brand, HttpServletRequest request) {
+			HttpServletRequest request) {
 		logger.info("Requested new short for uri " + url);
 		if (personalizada != null && !personalizada.equals("")) {
 			ShortURL urlconID = shortURLRepository.findByHash(personalizada);
@@ -165,9 +212,6 @@ public class UrlShortenerControllerWithLogs {
 				}
 				// las recomendaciones se separan con el separador ":"
 				throw new Error400Response("La URL a personalizar ya existe:" + SugerenciaSufijo + ":" + SugerenciaSufijo2);
-
-				// return new ResponseEntity<>(urlconID,
-				// HttpStatus.BAD_REQUEST);
 			}
 		}
 		ShortURL su = createAndSaveIfValid(url, personalizada);
