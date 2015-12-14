@@ -77,11 +77,14 @@ function comprobarSugerencias(input) {
     // esperamos un segundo
     timer = setTimeout(function(){
       //document.getElementById("urlPerson").value=id;
+      document.getElementById("sugerencias").style.display = "none";
       $("#sugerencia").html( "<img src='./images/ring.svg' alt='Cargando'></br>");
 
       $.get( "/sugerencias/recomendadas",
         { url: document.getElementById("url").value,
        personalizada: document.getElementById("urlPerson").value } )
+       //cambiar a $("url").value
+       //$("boton").keydown()
        .done(function(data) {
           if(data.length>1){
             var sugerencias=0;
