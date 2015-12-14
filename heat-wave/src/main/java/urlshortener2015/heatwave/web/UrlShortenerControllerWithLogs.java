@@ -169,10 +169,17 @@ public class UrlShortenerControllerWithLogs {
 				String body = response.getBody();
 				// a partir de la posicion 5 están los resultados
 				// se añaden dos sugerencias si la api ha devuelto resultados
-				// son en posiciones impares (en las pares hay comas
-				lista.add(new Sugerencia(body.split("\"")[5]));
-				lista.add(new Sugerencia(body.split("\"")[7]));
-				lista.add(new Sugerencia(body.split("\"")[9]));
+				// son en posiciones impares (en las pares hay comas)
+				int sugerenciasIngles=0;
+				int i=5;
+				while(sugerenciasIngles<4){
+					if(shortURLRepository.findByHash(body.split("\"")[i])==null){
+						lista.add(new Sugerencia(body.split("\"")[i]));
+						sugerenciasIngles++;
+					}
+					// son en posiciones impares (en las pares hay comas)
+					i+=2;
+				}
 
 			} catch (Exception a) {
 			}
