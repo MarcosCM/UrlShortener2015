@@ -34,7 +34,6 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.hash.Hashing;
 
 import urlshortener2015.heatwave.entities.Click;
-import urlshortener2015.heatwave.entities.noun;
 import urlshortener2015.heatwave.entities.Estadisticas;
 import urlshortener2015.heatwave.entities.HelloMessage;
 import urlshortener2015.heatwave.entities.ShortURL;
