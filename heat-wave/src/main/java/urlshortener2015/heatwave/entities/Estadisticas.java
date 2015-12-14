@@ -33,9 +33,9 @@ public class Estadisticas {
 	@Override
 	public String toString() {
 
-		String resultado = "Este enlace ha recibido " + clicks + " clicks";
-		resultado += "</br>La url es " + url;
-		resultado += "</br>La fecha de creación es " + fechaCreacion;
+		String resultado = "{Estadisticas: {clicks: \"" + clicks + 
+				"\", url: \"" + url
+				+ "\", Fecha: \"" + fechaCreacion + "\" }}";
 
 		return resultado;
 	}
