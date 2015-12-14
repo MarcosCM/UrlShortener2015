@@ -1,8 +1,6 @@
 package urlshortener2015.heatwave.web;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -68,9 +66,11 @@ public class UrlShortenerControllerWithLogs {
 	 * Crea una URL acortada
 	 * @param url URL a acortar
 	 * @param customTag Etiqueta personalizada
-	 * @return URL acortada en caso de éxito, error en caso contrario
+	 * @return URL acortada en caso de exito, error en caso contrario
+	 * @throws URISyntaxException
+	 * @throws MalformedURLException
 	 */
-	private ShortURL createAndSaveIfValid(String url, String customTag) {
+	private ShortURL createAndSaveIfValid(String url, String customTag) throws MalformedURLException, URISyntaxException {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
@@ -78,23 +78,22 @@ public class UrlShortenerControllerWithLogs {
 				id = customTag;
 			}
 			
-			// Se hace un get de la url a acortar para comprobar que la url no es una redirecciÃ³n a sÃ­ misma.
+			// Se hace un get de la url a acortar para comprobar que la url no es una redireccion a si misma.
 			Client client = ClientBuilder.newClient();
 			Response response = client.target(url).request().get();
-			// Si el cÃ³digo es un 3xx y el Location es 'url' --> es redirecciÃ³n de sÃ­ misma.
+			// Si el codigo es un 3xx y el Location es 'url' --> es redireccion de si misma.
 			if (response.getStatus() / 100 == 3){
 				try {
 					URI entrada = new URI(url);
 					if (entrada.compareTo(response.getLocation()) == 0)
-						throw new Error400Response("La URL a acortar es redirecciÃ³n de sÃ­ misma.");
+						throw new Error400Response("La URL a acortar es redireccion de si misma.");
 				} catch (URISyntaxException e) {
-					throw new Error400Response("La URL a acortar no es válida.");
+					throw new Error400Response("La URL a acortar no es valida.");
 				}
 			}
 			
 			// si ya existe devoler null
-			ShortURL su = new ShortURL(id, url,
-					linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(),
+			ShortURL su = new ShortURL(id, url, new URI(id),
 					new Date(System.currentTimeMillis()), HttpStatus.TEMPORARY_REDIRECT.value(), true);
 			return shortURLRepository.insert(su);
 		}
@@ -104,20 +103,9 @@ public class UrlShortenerControllerWithLogs {
 	}
 	
 	/**
-	 * 
-	 * @param url URL acortada
-	 * @return Página de redirección
-	 */
-	private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL url) {
-		HttpHeaders h = new HttpHeaders();
-		h.setLocation(URI.create(url.getTarget()));
-		return new ResponseEntity<>(h, HttpStatus.valueOf(url.getMode()));
-	}
-
-	/**
-	 * Redirecciona a la página de estadísticas
-	 * @param url URL sobre la que generar las estadísticas
-	 * @return Página de estadísticas
+	 * Redirecciona a la pagina de estadisticas
+	 * @param url URL sobre la que generar las estadisticas
+	 * @return Pagina de estadisticas
 	 */
 	private ResponseEntity<?> createSuccessfulRedirectToStatistic(ShortURL url) {
 		// En l tienes todos los datos de la shortURL
@@ -128,29 +116,10 @@ public class UrlShortenerControllerWithLogs {
 	}
 
 	/**
-	 * Redirección de una URL acortada
-	 * @param id Hash o etiqueta de la URL
-	 * @param request Petición
-	 * @return Página de redirección
-	 */
-	@RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
-	public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
-		logger.info("Requested redirection with hash " + id);
-		ShortURL url = shortURLRepository.findByHash(id);
-		if (url != null) {
-			createAndSaveClick(id, HttpServletRequestUtils.getBrowser(request),
-					HttpServletRequestUtils.getPlatform(request), HttpServletRequestUtils.getRemoteAddr(request));
-			return createSuccessfulRedirectToResponse(url);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-	}
-
-	/**
 	 * Devuelve sugerencias para una URL personalizada que ya existe
-	 * @param url URL sobre la que se está escribiendo una etiqueta
+	 * @param url URL sobre la que se esta escribiendo una etiqueta
 	 * @param personalizada Etiqueta para dicha URL
-	 * @return Lista de sugerencias o vacío si la etiqueta no está cogida
+	 * @return Lista de sugerencias o vacio si la etiqueta no esta cogida
 	 */
 	@RequestMapping(value = "/sugerencias/recomendadas", method = RequestMethod.GET)
 	public ResponseEntity<ArrayList<Sugerencia>> sugerencias(@RequestParam(value = "url", required = false) String url,
@@ -171,10 +140,10 @@ public class UrlShortenerControllerWithLogs {
 	}
 
 	/**
-	 * Redirige a la página de estadísticas
+	 * Redirige a la pagina de estadisticas
 	 * @param id Hash o etiqueta de la URL
-	 * @param request Petición
-	 * @return Página de estadísticas
+	 * @param request Peticion
+	 * @return Pagina de estadisticas
 	 */
 	@RequestMapping(value = "/{id:(?!link|index).*}+", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectToEstadisticas(@PathVariable String id, HttpServletRequest request) {
@@ -193,13 +162,15 @@ public class UrlShortenerControllerWithLogs {
 	 * Acorta una URL especificada
 	 * @param url URL a acortar
 	 * @param personalizada Etiqueta personalizada solicitada para la URL
-	 * @param request Petición
-	 * @return Mensaje de éxito o error
+	 * @param request Peticion
+	 * @return Mensaje de exito o error
+	 * @throws URISyntaxException 
+	 * @throws MalformedURLException 
 	 */
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "personalizada", required = false) String personalizada,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws MalformedURLException, URISyntaxException {
 		logger.info("Requested new short for uri " + url);
 		if (personalizada != null && !personalizada.equals("")) {
 			ShortURL urlconID = shortURLRepository.findByHash(personalizada);

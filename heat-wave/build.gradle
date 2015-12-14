@@ -34,6 +34,10 @@ dependencies {
     compile 'org.glassfish.jersey.core:jersey-server:2.13'
     compile 'org.springframework.data:spring-data-mongodb:1.8.1.RELEASE'
     
+    compile 'jstl:jstl:1.2'
+    
+    compile 'org.apache.tomcat.embed:tomcat-embed-jasper:8.0.28'
+    
     compile 'commons-validator:commons-validator:1.4.0'
 	compile 'com.google.guava:guava:17.0'
 

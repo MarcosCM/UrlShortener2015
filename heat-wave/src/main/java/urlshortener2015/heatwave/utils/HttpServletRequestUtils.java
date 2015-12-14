@@ -5,31 +5,37 @@ import javax.servlet.http.HttpServletRequest;
 public class HttpServletRequestUtils {
 	
 	public static String getRemoteAddr(HttpServletRequest request){
-		return request.getRemoteAddr();
+		return request != null ? request.getRemoteAddr() : null;
 	}
 	
 	public static String getUserAgent(HttpServletRequest request){
-		return request.getHeader("User-Agent");
+		return request != null ? request.getHeader("User-Agent") : null;
 	}
 	
 	public static String getPlatform(HttpServletRequest request){
-		String userAgent = HttpServletRequestUtils.getUserAgent(request).toLowerCase();
-		if (userAgent.matches(".*windows.*")) return "Windows";
-		else if (userAgent.matches(".*unix.*") || userAgent.matches(".*linux.*")) return "Unix";
-		else if (userAgent.matches(".*mac.*")) return "Mac OS";
-		else return "Unknown";
+		if (request != null){
+			String userAgent = HttpServletRequestUtils.getUserAgent(request).toLowerCase();
+			if (userAgent.matches(".*windows.*")) return "Windows";
+			else if (userAgent.matches(".*unix.*") || userAgent.matches(".*linux.*")) return "Unix";
+			else if (userAgent.matches(".*mac.*")) return "Mac OS";
+			else return "Unknown";
+		}
+		else return null;
 	}
 	
 	public static String getBrowser(HttpServletRequest request){
-		String userAgent = HttpServletRequestUtils.getUserAgent(request).toLowerCase();
-		if (userAgent.matches(".*opera.*")) return "Opera";
-		else if (userAgent.matches(".*edge.*")) return "Microsoft Edge";
-		else if (userAgent.matches(".*chromium.*")) return "Chromium";
-		else if (userAgent.matches(".*safari.*")) return "Safari";
-		else if (userAgent.matches(".*explorer.*")) return "Internet Explorer";
-		else if (userAgent.matches(".*firefox.*")) return "Firefox";
-		else if (userAgent.matches(".*chrome.*")) return "Chrome";
-		else return "Unknown";
+		if (request != null){
+			String userAgent = HttpServletRequestUtils.getUserAgent(request).toLowerCase();
+			if (userAgent.matches(".*opera.*")) return "Opera";
+			else if (userAgent.matches(".*edge.*")) return "Microsoft Edge";
+			else if (userAgent.matches(".*chromium.*")) return "Chromium";
+			else if (userAgent.matches(".*safari.*")) return "Safari";
+			else if (userAgent.matches(".*explorer.*")) return "Internet Explorer";
+			else if (userAgent.matches(".*firefox.*")) return "Firefox";
+			else if (userAgent.matches(".*chrome.*")) return "Chrome";
+			else return "Unknown";
+		}
+		else return null;
 	}
 	
 	public static String getCountry(HttpServletRequest request){
