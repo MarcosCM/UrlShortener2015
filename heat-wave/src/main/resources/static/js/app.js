@@ -88,7 +88,7 @@ function comprobarSugerencias(input) {
        .done(function(data) {
           if(data.length>1){
             var sugerencias=0;
-            $("#sugerencia").html( "<h4>Sugerencias, elige la que más te guste:<h4> </br>");
+            $("#sugerencia").html( "<h5>Esa url personalizada ya está ocupada, aquí hay unas cuantas sugerencias que te podrían interesar:<h5> </br>");
             var sugerenciasBotones="";
             while(sugerencias<data.length){
               obj=data[sugerencias];
