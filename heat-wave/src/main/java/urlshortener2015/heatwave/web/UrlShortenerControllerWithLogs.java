@@ -127,7 +127,7 @@ public class UrlShortenerControllerWithLogs {
 		Estadisticas stats = new Estadisticas(clickRepository.countByHash(l.getHash()), l.getTarget(),
 				l.getDate().toString());
 		String Json = stats.toString();
-		return new ResponseEntity<>(Json, HttpStatus.OK);
+		return new ResponseEntity<>(stats, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET)
