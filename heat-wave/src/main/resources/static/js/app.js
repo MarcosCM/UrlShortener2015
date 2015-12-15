@@ -31,7 +31,7 @@ $(document).ready(function() {
                       $("#sugerencia").html( "<h4>Sugerencias, elige la que más te guste:<h4> </br>");
                       var sugerenciasBotones="";
                       while(sugerencias<atributos.length){
-                        sugerenciasBotones+="<button id='"+atributos[sugerencias]+"' onclick='elegirSugerencia(this.id)' type='button' class='btn btn-default'>"+atributos[sugerencias]+" </button>";
+                        sugerenciasBotones+="<button id='"+atributos[sugerencias]+"' onclick='elegirSugerencia(this.id)' type='button' class='btn btn-link'>"+atributos[sugerencias]+" </button>";
                         sugerencias=sugerencias+1;
                       }
                       $("#sugerencias").html( sugerenciasBotones);

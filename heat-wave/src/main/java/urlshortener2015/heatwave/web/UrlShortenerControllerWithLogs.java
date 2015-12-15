@@ -94,7 +94,9 @@ public class UrlShortenerControllerWithLogs {
 					linkTo(methodOn(UrlShortenerControllerWithLogs.class).redirectTo(id, null)).toUri(),
 					new Date(System.currentTimeMillis()), HttpStatus.TEMPORARY_REDIRECT.value(), true);
 			return shortURLRepository.insert(su);
-		} else {
+
+		}
+		else {
 			return null;
 		}
 	}
@@ -145,10 +147,8 @@ public class UrlShortenerControllerWithLogs {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-
-	@RequestMapping(value = "/sugerencias/recomendadas", method = RequestMethod.GET)
-	public ResponseEntity<ArrayList<Sugerencia>> sugerencias(@RequestParam(value = "url", required = false) String url,
-			@RequestParam(value = "personalizada", required = false) String personalizada) {
+	
+	private  ArrayList<Sugerencia> listaSugerencais(String personalizada){
 		ArrayList<Sugerencia> lista = new ArrayList<Sugerencia>();
 		if (personalizada != null && !personalizada.equals("")
 				&& shortURLRepository.findByHash(personalizada) != null) {
@@ -184,6 +184,12 @@ public class UrlShortenerControllerWithLogs {
 			} catch (Exception a) {
 			}
 		}
+			return lista;
+	}
+	@RequestMapping(value = "/sugerencias/recomendadas", method = RequestMethod.GET)
+	public ResponseEntity<ArrayList<Sugerencia>> sugerencias(@RequestParam(value = "url", required = false) String url,
+			@RequestParam(value = "personalizada", required = false) String personalizada) {
+		ArrayList<Sugerencia> lista = listaSugerencais( personalizada);
 		return new ResponseEntity<>(lista, HttpStatus.OK);
 	}
 
@@ -232,8 +238,12 @@ public class UrlShortenerControllerWithLogs {
 					SugerenciaSufijo2 = Sugerencias.sugerenciaSufijos(shortURLRepository, personalizada);
 				}
 				// las recomendaciones se separan con el separador ":"
-				throw new Error400Response(
-						"La URL a personalizar ya existe:" + SugerenciaSufijo + ":" + SugerenciaSufijo2);
+				ArrayList<Sugerencia> lista = listaSugerencais( personalizada);
+				String menssageError="La URL a personalizar ya existe";
+				for (int i=0;i<lista.size();i++){
+					menssageError+=":"+lista.get(i).getRecomendacion();
+				}
+				throw new Error400Response(menssageError);
 
 				// return new ResponseEntity<>(urlconID,
 				// HttpStatus.BAD_REQUEST);
