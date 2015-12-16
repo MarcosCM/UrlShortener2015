@@ -1,9 +1,9 @@
 package urlshortener2015.heatwave.entities;
 
-public class Sugerencia {
+public class Suggestion {
 	
 	String recomendacion="";
-	public Sugerencia(String nueva){
+	public Suggestion(String nueva){
 		recomendacion=nueva;
 	}
 	public String getRecomendacion() {

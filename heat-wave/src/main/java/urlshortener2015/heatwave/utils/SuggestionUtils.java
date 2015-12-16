@@ -3,7 +3,7 @@ package urlshortener2015.heatwave.utils;
 import java.util.Random;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
 
-public class Sugerencias {
+public class SuggestionUtils {
 	
 	public static String sugerenciaSufijos(ShortURLRepository repositorio, String nombre){
 		Random random= new Random();

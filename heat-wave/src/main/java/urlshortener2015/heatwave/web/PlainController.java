@@ -1,6 +1,9 @@
 package urlshortener2015.heatwave.web;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,11 +17,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import urlshortener2015.heatwave.entities.Estadisticas;
+import urlshortener2015.heatwave.entities.Click;
+import urlshortener2015.heatwave.entities.DetailedStats;
+import urlshortener2015.heatwave.entities.BasicStats;
 import urlshortener2015.heatwave.entities.ShortURL;
 import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
+import urlshortener2015.heatwave.utils.ClickUtils;
 import urlshortener2015.heatwave.utils.HttpServletRequestUtils;
 
 @Controller
@@ -53,7 +59,7 @@ public class PlainController {
 		if (url != null) {
 			UrlShortenerControllerWithLogs.createAndSaveClick(id, HttpServletRequestUtils.getBrowser(request),
 					HttpServletRequestUtils.getPlatform(request), HttpServletRequestUtils.getRemoteAddr(request), clickRepository);
-			Estadisticas stats = new Estadisticas(clickRepository.countByHash(url.getHash()), url.getTarget(), url.getDate().toString());
+			BasicStats stats = new BasicStats(clickRepository.countByHash(url.getHash()), url.getTarget(), url.getDate().toString());
 			// this.template.convertAndSend("/sockets/"+id, new
 			// Greeting(resultado));
 			this.template.convertAndSend("/sockets/" + id, stats);
@@ -64,6 +70,40 @@ public class PlainController {
 			return "redirecting";
 		} else {
 			throw new Error400Response("La URL no existe");
+		}
+	}
+	
+	/**
+	 * Redirige a la pagina de estadisticas
+	 * @param id Hash o etiqueta de la URL
+	 * @param request Peticion
+	 * @param model Modelo con atributos
+	 * @return Pagina de estadisticas
+	 */
+	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}+", method = RequestMethod.GET)
+	public String redirectToEstadisticas(@PathVariable String id, HttpServletRequest request, Model model) {
+		logger.info("Requested redirection with hash " + id);
+		ShortURL url = shortURLRepository.findByHash(id);
+		if (url != null) {
+			//DetailedStats detailedStats = ClickUtils.fromMapToChartParams(url, clickRepository.aggregateInfoByHash(id));
+			// TESTEO
+			Map<String, Integer> data = new HashMap<String, Integer>();
+			data.put("Firefox", 5);
+			data.put("Chrome", 10);
+			data.put("Opera", 2);
+			Map<String, String> options = new HashMap<String, String>();
+			options.put("title",  "By Browser");
+			String type = "PieChart";
+			DetailedStats.ChartData chartData = new DetailedStats.ChartData(data, options, type);
+			Map<String, DetailedStats.ChartData> charts = new HashMap<String, DetailedStats.ChartData>();
+			charts.put("Browser", chartData);
+			DetailedStats detailedStats = new DetailedStats(url, charts);
+			//FIN TESTEO
+			model.addAttribute("detailedStats", detailedStats);
+			return "stats";
+		} else {
+			model.addAttribute("errorCause", "Sorry, that shortened URL does not exist.");
+			return "error";
 		}
 	}
 }

@@ -31,14 +31,14 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.hash.Hashing;
 
 import urlshortener2015.heatwave.entities.Click;
-import urlshortener2015.heatwave.entities.Estadisticas;
+import urlshortener2015.heatwave.entities.BasicStats;
 import urlshortener2015.heatwave.entities.HelloMessage;
 import urlshortener2015.heatwave.entities.ShortURL;
-import urlshortener2015.heatwave.entities.Sugerencia;
+import urlshortener2015.heatwave.entities.Suggestion;
 import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
-import urlshortener2015.heatwave.utils.Sugerencias;
+import urlshortener2015.heatwave.utils.SuggestionUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 
 @RestController
@@ -106,47 +106,27 @@ public class UrlShortenerControllerWithLogs {
 			return null;
 		}
 	}
-	
-	/**
-	 * Redirecciona a la pagina de estadisticas
-	 * @param url URL sobre la que generar las estadisticas
-	 * @return Pagina de estadisticas
-	 */
-	public static ResponseEntity<?> createSuccessfulRedirectToStatistic(ShortURL url, ClickRepository clickRepository) {
-		// En url tienes todos los datos de la shortURL
-		String resultado = "Número de clicks: " + clickRepository.countByHash(url.getHash());
-		resultado += "</br>Url: " + url.getTarget();
-		resultado += "</br>Fecha: " + url.getDate().toString();
-		String a = "<!DOCTYPE html>\n" + "<html>\n" + "<head>\n" + "    <title>Hello WebSocket</title>\n"
-				+ "    <script src='js/sockjs-0.3.4.js'></script>\n" + "    <script src='js/stomp.js'></script>\n"
-				+ "    <script src='js/webSocketImpl.js'></script>\n" + "</head>\n" + "<body onload='connect()'>\n"
-				+ "<noscript><h2 style='color: #ff0000'>Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable\n"
-				+ "    Javascript and reload this page!</h2></noscript>\n" + "<div>\n" + "    <div>\n" + "    </div>\n"
-				+ "    <div id='conversationDiv'>\n" + "<p id='response'>" + resultado + "</p>\n" + "    </div>\n"
-				+ "</div>\n" + "</body>\n" + "</html>";
-		return new ResponseEntity<>(a, HttpStatus.OK);
-	}
 
 	public static ResponseEntity<?> createSuccessfulRedirectToStatisticJson(ShortURL url, ClickRepository clickRepository) {
 		// En l tienes todos los datos de la shortURL
-		Estadisticas stats = new Estadisticas(clickRepository.countByHash(url.getHash()), url.getTarget(),
+		BasicStats stats = new BasicStats(clickRepository.countByHash(url.getHash()), url.getTarget(),
 				url.getDate().toString());
 		//String json = stats.toString();
 		return new ResponseEntity<>(stats, HttpStatus.OK);
 	}
 	
-	private static ArrayList<Sugerencia> listaSugerencias(String customTag, ShortURLRepository shortURLRepository){
-		ArrayList<Sugerencia> lista = new ArrayList<Sugerencia>();
+	private static ArrayList<Suggestion> listaSugerencias(String customTag, ShortURLRepository shortURLRepository){
+		ArrayList<Suggestion> lista = new ArrayList<Suggestion>();
 		if (customTag != null && !customTag.equals("") && shortURLRepository.findByHash(customTag) != null) {
-			String sugerenciaSufijo = Sugerencias.sugerenciaSufijos(shortURLRepository, customTag);
+			String sugerenciaSufijo = SuggestionUtils.sugerenciaSufijos(shortURLRepository, customTag);
 			String sugerenciaSufijo2 = sugerenciaSufijo;
 
 			while (sugerenciaSufijo2.equals(sugerenciaSufijo)) {
-				sugerenciaSufijo2 = Sugerencias.sugerenciaSufijos(shortURLRepository, customTag);
+				sugerenciaSufijo2 = SuggestionUtils.sugerenciaSufijos(shortURLRepository, customTag);
 			}
 
-			lista.add(new Sugerencia(sugerenciaSufijo2));
-			lista.add(new Sugerencia(sugerenciaSufijo));
+			lista.add(new Suggestion(sugerenciaSufijo2));
+			lista.add(new Suggestion(sugerenciaSufijo));
 			RestTemplate restTemplate = new RestTemplate();
 			try {
 				ResponseEntity<String> response = restTemplate.getForEntity("http://words.bighugelabs.com/api/2/c302f07e3593264f58a7366800330462/"
@@ -159,7 +139,7 @@ public class UrlShortenerControllerWithLogs {
 				int i=5;
 				while(sugerenciasIngles<4){
 					if(shortURLRepository.findByHash(body.split("\"")[i])==null){
-						lista.add(new Sugerencia(body.split("\"")[i]));
+						lista.add(new Suggestion(body.split("\"")[i]));
 						sugerenciasIngles++;
 					}
 					// son en posiciones impares (en las pares hay comas)
@@ -177,28 +157,11 @@ public class UrlShortenerControllerWithLogs {
 	 * @return Lista de sugerencias o vacio si la etiqueta no esta cogida
 	 */
 	@RequestMapping(value = "/sugerencias/recomendadas", method = RequestMethod.GET)
-	public ResponseEntity<ArrayList<Sugerencia>> sugerencias(@RequestParam(value = "url", required = false) String url,
+	public ResponseEntity<ArrayList<Suggestion>> sugerencias(@RequestParam(value = "url", required = false) String url,
 			@RequestParam(value = "customTag", required = false) String customTag) {
 		logger.info("Getting suggestions for the custom tag: " + customTag);
-		ArrayList<Sugerencia> lista = UrlShortenerControllerWithLogs.listaSugerencias(customTag, shortURLRepository);
+		ArrayList<Suggestion> lista = UrlShortenerControllerWithLogs.listaSugerencias(customTag, shortURLRepository);
 		return new ResponseEntity<>(lista, HttpStatus.OK);
-	}
-
-	/**
-	 * Redirige a la pagina de estadisticas
-	 * @param id Hash o etiqueta de la URL
-	 * @param request Peticion
-	 * @return Pagina de estadisticas
-	 */
-	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}+", method = RequestMethod.GET)
-	public ResponseEntity<?> redirectToEstadisticas(@PathVariable String id, HttpServletRequest request) {
-		logger.info("Requested redirection with hash " + id);
-		ShortURL l = shortURLRepository.findByHash(id);
-		if (l != null) {
-			return UrlShortenerControllerWithLogs.createSuccessfulRedirectToStatistic(l, clickRepository);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 	}
 
 	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}+/json", method = RequestMethod.GET)
@@ -234,13 +197,13 @@ public class UrlShortenerControllerWithLogs {
 			ShortURL urlConID = shortURLRepository.findByHash(customTag);
 			if (urlConID != null) {
 				// la url personalizada ya existe
-				String SugerenciaSufijo = Sugerencias.sugerenciaSufijos(shortURLRepository, customTag);
+				String SugerenciaSufijo = SuggestionUtils.sugerenciaSufijos(shortURLRepository, customTag);
 				String SugerenciaSufijo2 = SugerenciaSufijo;
 				while (SugerenciaSufijo2.equals(SugerenciaSufijo)) {
-					SugerenciaSufijo2 = Sugerencias.sugerenciaSufijos(shortURLRepository, customTag);
+					SugerenciaSufijo2 = SuggestionUtils.sugerenciaSufijos(shortURLRepository, customTag);
 				}
 				// las recomendaciones se separan con el separador ":"
-				ArrayList<Sugerencia> lista = UrlShortenerControllerWithLogs.listaSugerencias(customTag, shortURLRepository);
+				ArrayList<Suggestion> lista = UrlShortenerControllerWithLogs.listaSugerencias(customTag, shortURLRepository);
 				String messageError = "La URL a personalizar ya existe";
 				for (int i=0; i<lista.size(); i++){
 					messageError += ":" + lista.get(i).getRecomendacion();
@@ -264,8 +227,8 @@ public class UrlShortenerControllerWithLogs {
 	// A donde llega los mensajes de los sockets desde el cliente
 	@MessageMapping("/stadistics")
 	// @SendTo("/sockets/IDPARAMANDAR")
-	public Estadisticas respuestaSocket(HelloMessage infoQueLlega) throws Exception {
-		return new Estadisticas(new Long(1), "", "");
+	public BasicStats respuestaSocket(HelloMessage infoQueLlega) throws Exception {
+		return new BasicStats(new Long(1), "", "");
 	}
 
 }
