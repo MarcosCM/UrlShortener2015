@@ -2,7 +2,6 @@ package urlshortener2015.heatwave.web;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,14 +16,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import urlshortener2015.heatwave.entities.Click;
 import urlshortener2015.heatwave.entities.DetailedStats;
 import urlshortener2015.heatwave.entities.BasicStats;
 import urlshortener2015.heatwave.entities.ShortURL;
 import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
-import urlshortener2015.heatwave.utils.ClickUtils;
 import urlshortener2015.heatwave.utils.HttpServletRequestUtils;
 
 @Controller
