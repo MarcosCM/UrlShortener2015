@@ -233,18 +233,9 @@ public class UrlShortenerControllerWithLogs {
 		if (customTag != null && !customTag.equals("")) {
 			ShortURL urlConID = shortURLRepository.findByHash(customTag);
 			if (urlConID != null) {
-				// la url personalizada ya existe
-				String SugerenciaSufijo = Sugerencias.sugerenciaSufijos(shortURLRepository, customTag);
-				String SugerenciaSufijo2 = SugerenciaSufijo;
-				while (SugerenciaSufijo2.equals(SugerenciaSufijo)) {
-					SugerenciaSufijo2 = Sugerencias.sugerenciaSufijos(shortURLRepository, customTag);
-				}
-				// las recomendaciones se separan con el separador ":"
-				ArrayList<Sugerencia> lista = UrlShortenerControllerWithLogs.listaSugerencias(customTag, shortURLRepository);
+				//la url personalizada ya existe
 				String messageError = "La URL a personalizar ya existe";
-				for (int i=0; i<lista.size(); i++){
-					messageError += ":" + lista.get(i).getRecomendacion();
-				}
+				
 				throw new Error400Response(messageError);
 
 				// return new ResponseEntity<>(urlconID,
