@@ -1,9 +1,10 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 	<head>
 		<title>Redirigiendo...</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<!-- If the browser disabled JS -->
+		<!-- If JS is disabled -->
 		<noscript><meta http-equiv="Refresh" content="${countDown};url=${targetURL}" /></noscript>
 		<link rel="stylesheet" type="text/css"
 			href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
@@ -26,10 +27,15 @@
 	</head>
 	<body>
 		<div class="container-full">
+			<c:if test="${enableAds}">
+			<div id="header_container">
+				<img src="${advertisement}" alt="Ad" style="width: 100%; max-width: 100%; max-height: 150px">
+			</div>
 			<br/>
+			</c:if>
 			<div class="row">
 				<div class="col-lg-12 text-center">
-					Redirigiendo en <span id="countDown"><strong>${countDown}</strong><span>...
+					Redirigiendo en <span id="countDown"><strong>${countDown}</strong></span>...
 				</div>
 			</div>
 		</div>

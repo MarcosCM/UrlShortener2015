@@ -43,7 +43,6 @@ $(document).ready(function() {
                       $("#result").html( "<div class='alert alert-danger lead'>" +  atributos[0] + "</div>");
                       document.getElementById("sugerencias").style.display = "none";
                       document.getElementById("sugerencia").style.display = "none";
-
                     }
                   }
               });

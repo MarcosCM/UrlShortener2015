@@ -1,5 +1,7 @@
 package urlshortener2015.heatwave.web;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -31,15 +33,18 @@ public class PlainController {
 	 * @param request Peticion
 	 * @param model Modelo con atributos
 	 * @return Pagina de redireccion
+	 * @throws IOException Si el archivo que contiene la imagen de publicidad no existe o no es una imagen
 	 */
 	@RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
-	public String redirectTo(@PathVariable String id, HttpServletRequest request, Model model) {
+	public String redirectTo(@PathVariable String id, HttpServletRequest request, Model model) throws IOException {
 		logger.info("Requested redirection to statistics with hash " + id);
 		ShortURL url = shortURLRepository.findByHash(id);
 		
 		if (url != null) {
 			model.addAttribute("targetURL", url.getTarget());
 			model.addAttribute("countDown", DEFAULT_COUNTDOWN);
+			model.addAttribute("advertisement", "./images/header.png");
+			model.addAttribute("enableAds", url.getAds());
 			return "redirecting";
 		} else {
 			throw new Error400Response("La URL no existe");

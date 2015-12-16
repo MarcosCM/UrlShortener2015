@@ -25,6 +25,7 @@ dependencies {
 
 	compile 'org.springframework.boot:spring-boot-starter-web:1.2.6.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-jdbc:1.2.6.RELEASE'
+    compile 'org.springframework.data:spring-data-mongodb:1.8.1.RELEASE'
     compile 'org.springframework.hateoas:spring-hateoas:0.16.0.RELEASE'
     compile 'org.springframework.plugin:spring-plugin-core:1.1.0.RELEASE'
 
@@ -32,12 +33,12 @@ dependencies {
     compile 'org.webjars:bootstrap:3.3.5'
     compile 'org.webjars:jquery:2.1.4'
     compile 'org.glassfish.jersey.core:jersey-server:2.13'
-    compile 'org.springframework.data:spring-data-mongodb:1.8.1.RELEASE'
     
     compile 'jstl:jstl:1.2'
     
     compile 'org.apache.tomcat.embed:tomcat-embed-jasper:8.0.28'
     
+    compile 'commons-codec:commons-codec:1.9'
     compile 'commons-validator:commons-validator:1.4.0'
 	compile 'com.google.guava:guava:17.0'
 

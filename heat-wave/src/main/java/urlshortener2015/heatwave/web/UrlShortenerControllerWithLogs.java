@@ -66,11 +66,12 @@ public class UrlShortenerControllerWithLogs {
 	 * Crea una URL acortada
 	 * @param url URL a acortar
 	 * @param customTag Etiqueta personalizada
+	 * @param ads Mostrar anuncios
 	 * @return URL acortada en caso de exito, error en caso contrario
 	 * @throws URISyntaxException
 	 * @throws MalformedURLException
 	 */
-	private ShortURL createAndSaveIfValid(String url, String customTag) throws MalformedURLException, URISyntaxException {
+	private ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads) throws MalformedURLException, URISyntaxException {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
@@ -92,9 +93,9 @@ public class UrlShortenerControllerWithLogs {
 				}
 			}
 			
-			// si ya existe devoler null
-			ShortURL su = new ShortURL(id, url, new URI(id),
-					new Date(System.currentTimeMillis()), HttpStatus.TEMPORARY_REDIRECT.value(), true);
+			// Si ya existe devolver null
+			ShortURL su = new ShortURL(id, url, new URI(id), new Date(System.currentTimeMillis()),
+					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads);
 			return shortURLRepository.insert(su);
 		}
 		else {
@@ -161,7 +162,7 @@ public class UrlShortenerControllerWithLogs {
 	/**
 	 * Acorta una URL especificada
 	 * @param url URL a acortar
-	 * @param personalizada Etiqueta personalizada solicitada para la URL
+	 * @param customTag Etiqueta personalizada solicitada para la URL
 	 * @param request Peticion
 	 * @return Mensaje de exito o error
 	 * @throws URISyntaxException 
@@ -169,23 +170,27 @@ public class UrlShortenerControllerWithLogs {
 	 */
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
-			@RequestParam(value = "personalizada", required = false) String personalizada,
+			@RequestParam(value = "customTag", required = false) String customTag,
+			@RequestParam(value = "disableAd", required = false) Boolean disableAd,
 			HttpServletRequest request) throws MalformedURLException, URISyntaxException {
 		logger.info("Requested new short for uri " + url);
-		if (personalizada != null && !personalizada.equals("")) {
-			ShortURL urlconID = shortURLRepository.findByHash(personalizada);
+		Boolean ads;
+		if (disableAd == null || !disableAd) ads = new Boolean(true);
+		else ads = new Boolean(false);
+		if (customTag != null && !customTag.equals("")) {
+			ShortURL urlconID = shortURLRepository.findByHash(customTag);
 			if (urlconID != null) {
 				// la url personalizada ya existe
-				String SugerenciaSufijo = Sugerencias.sugerenciaSufijos(shortURLRepository, personalizada);
+				String SugerenciaSufijo = Sugerencias.sugerenciaSufijos(shortURLRepository, customTag);
 				String SugerenciaSufijo2 = SugerenciaSufijo;
 				while (SugerenciaSufijo2.equals(SugerenciaSufijo)) {
-					SugerenciaSufijo2 = Sugerencias.sugerenciaSufijos(shortURLRepository, personalizada);
+					SugerenciaSufijo2 = Sugerencias.sugerenciaSufijos(shortURLRepository, customTag);
 				}
 				// las recomendaciones se separan con el separador ":"
 				throw new Error400Response("La URL a personalizar ya existe:" + SugerenciaSufijo + ":" + SugerenciaSufijo2);
 			}
 		}
-		ShortURL su = createAndSaveIfValid(url, personalizada);
+		ShortURL su = createAndSaveIfValid(url, customTag, ads);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());

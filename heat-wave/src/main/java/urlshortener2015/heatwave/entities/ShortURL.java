@@ -14,14 +14,16 @@ public class ShortURL {
 	private Date date;
 	private Integer mode;
 	private Boolean safe;
+	private Boolean ads;
 
-	public ShortURL(String hash, String target, URI uri, Date date, Integer mode, Boolean safe) {
+	public ShortURL(String hash, String target, URI uri, Date date, Integer mode, Boolean safe, Boolean ads) {
 		this.hash = hash;
 		this.target = target;
 		this.uri = uri;
 		this.date = date;
 		this.mode = mode;
 		this.safe = safe;
+		this.ads = ads;
 	}
 
 	public ShortURL() {}
@@ -48,6 +50,10 @@ public class ShortURL {
 
 	public Boolean getSafe() {
 		return safe;
+	}
+	
+	public Boolean getAds() {
+		return ads;
 	}
 
 	public void setSafe(Boolean safe){
