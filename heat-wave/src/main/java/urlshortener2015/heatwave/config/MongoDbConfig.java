@@ -24,9 +24,9 @@ import com.mongodb.ServerAddress;
 @EnableScheduling
 @EnableMongoRepositories(basePackageClasses=urlshortener2015.heatwave.repository.ClickRepository.class)
 @PropertySource(value = { "classpath:database.properties" })
-public class MongoDbController {
+public class MongoDbConfig {
 	
-	private static final Logger logger = LoggerFactory.getLogger(MongoDbController.class);
+	private static final Logger logger = LoggerFactory.getLogger(MongoDbConfig.class);
 	
 	@Value("${database.mongo.host}")
 	private String host;

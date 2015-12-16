@@ -104,40 +104,33 @@ public class UrlShortenerTests {
 		this.mockMvc = MockMvcBuilders.standaloneSetup(urlShortener).build();
 	}
 
-
 	@Test
-	public void thatShortenerPersonalizadaAndStadisticsJSon() throws Exception {
+	public void thatShortenerPersonalizadaAndStatisticsJson() throws Exception {
 		configureTransparentSave();
-		Random a=new Random();
-		String nuevaPersonalizada="";
-		nuevaPersonalizada+= a.nextInt(1000)+a.nextInt(1000)+a.nextInt(1000)+a.nextInt(1000)+a.nextInt(1000);
-		mockMvc.perform(post("/link").param("url", "http://example.com/")
-				.param("personalizada",nuevaPersonalizada))
+		Random a = new Random();
+		String nuevaPersonalizada = "";
+		nuevaPersonalizada += a.nextInt(1000)+a.nextInt(1000)+a.nextInt(1000)+a.nextInt(1000)+a.nextInt(1000);
+		mockMvc.perform(post("/link").param("url", "http://www.example.com/")
+				.param("customTag", nuevaPersonalizada))
 				.andDo(print())
-				.andExpect(redirectedUrl("http://localhost/"+nuevaPersonalizada))
+				.andExpect(redirectedUrl(nuevaPersonalizada))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.hash", is(nuevaPersonalizada)))
-				.andExpect(jsonPath("$.uri", is("http://localhost/"+nuevaPersonalizada)))
-				.andExpect(jsonPath("$.target", is("http://example.com/")))
+				.andExpect(jsonPath("$.uri", is(nuevaPersonalizada)))
+				.andExpect(jsonPath("$.target", is("http://www.example.com/")))
 				.andExpect(jsonPath("$.sponsor", is(nullValue())));
-		//Stadistics with json of the shorted now
+		//Statistics with json of the shortened URL now
 		mockMvc.perform(get("http://localhost/"+nuevaPersonalizada+"+")
 		        .param("url", "http://example.com/").
 						accept(MediaType.TEXT_HTML).
 						accept(MediaType.APPLICATION_JSON));
-		
-	
 	}
-	
-
-
 
 	private void configureTransparentSave() {
 		when(shortURLRepository.insert(org.mockito.Matchers.any(ShortURL.class)))
 				.then(new Answer<ShortURL>() {
 					@Override
-					public ShortURL answer(InvocationOnMock invocation)
-							throws Throwable {
+					public ShortURL answer(InvocationOnMock invocation) throws Throwable {
 						return (ShortURL) invocation.getArguments()[0];
 					}
 				});
