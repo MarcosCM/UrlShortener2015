@@ -1,4 +1,4 @@
-package urlshortener2015.heatwave.database;
+package urlshortener2015.heatwave.config;
 
 import java.util.Arrays;
 

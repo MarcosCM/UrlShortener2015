@@ -31,7 +31,7 @@ $(document).ready(function() {
                       $("#sugerencia").html( "<h4>Sugerencias, elige la que más te guste:<h4> </br>");
                       var sugerenciasBotones="";
                       while(sugerencias<atributos.length){
-                        sugerenciasBotones+="<button id='"+atributos[sugerencias]+"' onclick='elegirSugerencia(this.id)' type='button' class='btn btn-default'>"+atributos[sugerencias]+" </button>";
+                        sugerenciasBotones+="<button id='"+atributos[sugerencias]+"' onclick='elegirSugerencia(this.id)' type='button' class='btn btn-link'>"+atributos[sugerencias]+" </button>";
                         sugerencias=sugerencias+1;
                       }
                       $("#sugerencias").html( sugerenciasBotones);
@@ -77,15 +77,18 @@ function comprobarSugerencias(input) {
     // esperamos un segundo
     timer = setTimeout(function(){
       //document.getElementById("urlPerson").value=id;
+      document.getElementById("sugerencias").style.display = "none";
       $("#sugerencia").html( "<img src='./images/ring.svg' alt='Cargando'></br>");
 
       $.get( "/sugerencias/recomendadas",
         { url: document.getElementById("url").value,
        personalizada: document.getElementById("urlPerson").value } )
+       //cambiar a $("url").value
+       //$("boton").keydown()
        .done(function(data) {
           if(data.length>1){
             var sugerencias=0;
-            $("#sugerencia").html( "<h4>Sugerencias, elige la que más te guste:<h4> </br>");
+            $("#sugerencia").html( "<h5>Esa url personalizada ya está ocupada, aquí hay unas cuantas sugerencias que te podrían interesar:<h5> </br>");
             var sugerenciasBotones="";
             while(sugerencias<data.length){
               obj=data[sugerencias];

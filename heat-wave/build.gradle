@@ -22,7 +22,8 @@ mainClassName = 'urlshortener2015.heatwave.Application'
 dependencies {
     // Provides the production database
     runtime 'org.hsqldb:hsqldb'
-
+    compile 'org.springframework.boot:spring-boot-starter-websocket'
+    compile 'org.springframework:spring-messaging'
 	compile 'org.springframework.boot:spring-boot-starter-web:1.2.6.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-jdbc:1.2.6.RELEASE'
     compile 'org.springframework.hateoas:spring-hateoas:0.16.0.RELEASE'
@@ -38,7 +39,7 @@ dependencies {
 	compile 'com.google.guava:guava:17.0'
 
     // Testing framework
-    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'    
     testCompile 'org.apache.httpcomponents:httpclient:4.5'
     testCompile 'com.jayway.jsonpath:json-path:0.9.1'
 }
