@@ -12,12 +12,16 @@ import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
 @Configuration
+@EnableAsync
+@EnableScheduling
 @EnableMongoRepositories(basePackageClasses=urlshortener2015.heatwave.repository.ClickRepository.class)
 @PropertySource(value = { "classpath:database.properties" })
 public class MongoDbConfig {
