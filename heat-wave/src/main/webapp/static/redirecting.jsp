@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Redirigiendo...</title>
+		<title>Redirecting...</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<!-- If JS is disabled -->
 		<noscript><meta http-equiv="Refresh" content="${countDown};url=${targetURL}" /></noscript>
@@ -34,8 +34,8 @@
 			<br/>
 			</c:if>
 			<div class="row">
-				<div class="col-lg-12 text-center">
-					Redirigiendo en <span id="countDown"><strong>${countDown}</strong></span>...
+				<div class="col-lg-12 text-center" style="font-size: 250%">
+					Redirecting in <span id="countDown"><strong>${countDown}</strong></span>...
 				</div>
 			</div>
 		</div>
