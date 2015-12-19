@@ -2,6 +2,8 @@ package urlshortener2015.heatwave.entities;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,8 +17,9 @@ public class ShortURL {
 	private Integer mode;
 	private Boolean safe;
 	private Boolean ads;
+	private Map<String, List<String>> users;
 
-	public ShortURL(String hash, String target, URI uri, Date date, Integer mode, Boolean safe, Boolean ads) {
+	public ShortURL(String hash, String target, URI uri, Date date, Integer mode, Boolean safe, Boolean ads, Map<String, List<String>> users) {
 		this.hash = hash;
 		this.target = target;
 		this.uri = uri;
@@ -24,6 +27,7 @@ public class ShortURL {
 		this.mode = mode;
 		this.safe = safe;
 		this.ads = ads;
+		this.users = users;
 	}
 
 	public ShortURL() {}
@@ -54,6 +58,10 @@ public class ShortURL {
 	
 	public Boolean getAds() {
 		return ads;
+	}
+	
+	public Map<String, List<String>> getUsers(){
+		return users;
 	}
 
 	public void setSafe(Boolean safe){

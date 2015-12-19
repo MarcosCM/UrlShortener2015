@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 
 import javax.ws.rs.client.Client;
@@ -38,6 +40,7 @@ import urlshortener2015.heatwave.entities.Suggestion;
 import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
+import urlshortener2015.heatwave.utils.HttpServletRequestUtils;
 import urlshortener2015.heatwave.utils.SuggestionUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 
@@ -74,7 +77,7 @@ public class UrlShortenerControllerWithLogs {
 	 * @throws URISyntaxException
 	 * @throws MalformedURLException
 	 */
-	public static ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads, ShortURLRepository shortURLRepository) throws MalformedURLException, URISyntaxException {
+	public static ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads, Map<String, List<String>> users, ShortURLRepository shortURLRepository) throws MalformedURLException, URISyntaxException {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
@@ -98,7 +101,7 @@ public class UrlShortenerControllerWithLogs {
 			
 			// Si ya existe devolver null
 			ShortURL su = new ShortURL(id, url, new URI(id), new Date(System.currentTimeMillis()),
-					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads);
+					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads, users);
 			return shortURLRepository.insert(su);
 
 		}
@@ -187,11 +190,14 @@ public class UrlShortenerControllerWithLogs {
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "customTag", required = false) String customTag,
-			@RequestParam(value = "disableAd", required = false) Boolean disableAd,
+			@RequestParam(value = "enableAd", required = false) Boolean enableAd,
 			HttpServletRequest request) throws MalformedURLException, URISyntaxException {
 		logger.info("Requested new short for uri " + url);
+		// Get users array
+		Map<String, List<String>> users = HttpServletRequestUtils.getUsers(request);
+		// Get ads enabling
 		Boolean ads;
-		if (disableAd == null || !disableAd) ads = new Boolean(true);
+		if (enableAd != null && enableAd) ads = new Boolean(true);
 		else ads = new Boolean(false);
 		if (customTag != null && !customTag.equals("")) {
 			ShortURL urlConID = shortURLRepository.findByHash(customTag);
@@ -214,7 +220,7 @@ public class UrlShortenerControllerWithLogs {
 				// HttpStatus.BAD_REQUEST);
 			}
 		}
-		ShortURL su = UrlShortenerControllerWithLogs.createAndSaveIfValid(url, customTag, ads, shortURLRepository);
+		ShortURL su = UrlShortenerControllerWithLogs.createAndSaveIfValid(url, customTag, ads, users, shortURLRepository);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
