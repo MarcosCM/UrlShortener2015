@@ -42,8 +42,8 @@
 					<br>
 					<div id="divPersonalizar" style="visibility: hidden;" class="input-group input-group-lg col-sm-offset-4 col-sm-4">
 						<div class="input-group">
-							<span id="divPersonalizar" class="input-group-addon" id="basic-addon3">http://localhost:8080/</span>
-							<input type="text"  name="customTag" class="form-control" id="urlPerson" onkeyup="comprobarSugerencias(this)" aria-describedby="basic-addon3">
+							<span id="divPersonalizar" class="input-group-addon" id="basic-addon3">http://shorturl.es/</span>
+							<input type="text" name="customTag" class="form-control" id="urlPerson" onkeyup="comprobarSugerencias(this)" aria-describedby="basic-addon3">
 						</div><!-- /input-group -->
 						<br>
 						<div id="sugerencia"></div>
@@ -60,6 +60,29 @@
 				</div>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-sm-offset-4 col-xs-12 col-sm-4 col-md-4 col-lg-4">
+				<p class="lead text-center">Log in to prevent ads</p>
+			</div>
+			<div class="col-sm-offset-4 col-xs-12 col-sm-4 col-md-4 col-lg-4">
+		        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+		        	<a id="gmailLoginRedirect" href="/login/gmail/" class="btn btn-lg btn-danger btn-block">Gmail</a>
+		        </div>
+		        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+		        	<a id="twitterLoginRedirect" href="/login/twitter/" class="btn btn-lg btn-info btn-block">Twitter</a>
+		        </div>
+		        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+		        	<a id="facebookLoginRedirect" href="/login/facebook/" class="btn btn-lg btn-primary btn-block">Facebook</a>
+		        </div>
+	        </div>
+	        <div class="col-sm-offset-4 col-xs-12 col-sm-4 col-md-4 col-lg-4">
+	        	<br>
+	        	<p class="lead text-center">Code of the URL to go to (or custom tag)</p>
+	        	<div class="text-center">
+	        		<input id="goToUrl" type="text" placeholder="Example: 4l0dcef">
+	        	</div>
+	        </div>
+    	</div>
 	</div>
 </body>
 </html>

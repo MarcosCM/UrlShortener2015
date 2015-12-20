@@ -2,6 +2,7 @@ package urlshortener2015.heatwave.web;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.social.facebook.api.Facebook;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +32,13 @@ public class PlainController {
 	private static final Logger logger = LoggerFactory.getLogger(PlainController.class);
 	
 	private static final int DEFAULT_COUNTDOWN = 10;
+	// Paths
+	private static final String DEFAULT_AD_PATH = "./images/header.png";
+	private static final String DEFAULT_REDIRECTING_PATH = "redirecting";
+	private static final String DEFAULT_STATS_PATH = "stats";
+	private static final String DEFAULT_ERROR_PATH = "error";
+	// Error messages
+	private static final String DEFAULT_URL_NOT_FOUND_MESSAGE = "That URL does not exist";
 	
 	@Autowired
 	private ShortURLRepository shortURLRepository;
@@ -39,6 +48,9 @@ public class PlainController {
 	
 	@Autowired
 	private SimpMessagingTemplate template;
+	
+	@Autowired
+	private Facebook facebook;
 	
 	/**
 	 * Redireccion de una URL acortada
@@ -56,17 +68,67 @@ public class PlainController {
 		if (url != null) {
 			UrlShortenerControllerWithLogs.createAndSaveClick(id, HttpServletRequestUtils.getBrowser(request),
 					HttpServletRequestUtils.getPlatform(request), HttpServletRequestUtils.getRemoteAddr(request), clickRepository);
-			BasicStats stats = new BasicStats(clickRepository.countByHash(url.getHash()), url.getTarget(), url.getDate().toString());
+			// BasicStats stats = new BasicStats(clickRepository.countByHash(url.getHash()), url.getTarget(), url.getDate().toString());
 			// this.template.convertAndSend("/sockets/"+id, new
 			// Greeting(resultado));
-			this.template.convertAndSend("/sockets/" + id, stats);
+			// this.template.convertAndSend("/sockets/" + id, stats);
 			model.addAttribute("targetURL", url.getTarget());
 			model.addAttribute("countDown", DEFAULT_COUNTDOWN);
-			model.addAttribute("advertisement", "./images/header.png");
+			model.addAttribute("advertisement", DEFAULT_AD_PATH);
 			model.addAttribute("enableAds", url.getAds());
-			return "redirecting";
+			return DEFAULT_REDIRECTING_PATH;
 		} else {
-			throw new Error400Response("La URL no existe");
+			throw new Error400Response(DEFAULT_URL_NOT_FOUND_MESSAGE);
+		}
+	}
+	
+	/**
+	 * Autenticacion logeando a traves de Facebook
+	 * @param id Hash o etiqueta de la URL
+	 * @param request Peticion
+	 * @param model Modelo con atributos
+	 * @return Pagina de redireccion
+	 * @throws IOException Si el archivo que contiene la imagen de publicidad no existe o no es una imagen
+	 */
+	@RequestMapping(value = "/login/facebook/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET)
+	public String facebookRedirectTo(@PathVariable String id, HttpServletRequest request, Model model){
+		ShortURL url = shortURLRepository.findByHash(id);
+		if (url != null){
+			// The user will be redirected
+			model.addAttribute("targetURL", url.getTarget());
+			model.addAttribute("countDown", DEFAULT_COUNTDOWN);
+			model.addAttribute("advertisement", DEFAULT_AD_PATH);
+			if (url.getAds()){
+				if (facebook.isAuthorized()){
+					List<String> mails;
+					if (url.getUsers() != null && (mails = url.getUsers().get("facebook")) != null){
+						String userMail = facebook.userOperations().getUserProfile().getEmail();
+						for(String mail : mails){
+							if (mail.equals(userMail)){
+								model.addAttribute("enableAds", false);
+								return DEFAULT_REDIRECTING_PATH;
+							}
+						}
+					}
+					// There is no Facebook users in that URL or the user is not in its Facebook users
+					model.addAttribute("enableAds", true);
+					return DEFAULT_REDIRECTING_PATH;
+				}
+				else{
+					// Facebook user does not authorize the app
+					// redirect to request mapped by ConnectController
+					return "redirect:/connect/facebook";
+				}
+			}
+			else{
+				// Ads are not enabled in the URL
+				model.addAttribute("enableAds", false);
+				return DEFAULT_REDIRECTING_PATH;
+			}
+		}
+		else{
+			// URL not found
+			throw new Error400Response(DEFAULT_URL_NOT_FOUND_MESSAGE);
 		}
 	}
 	
@@ -83,7 +145,7 @@ public class PlainController {
 		ShortURL url = shortURLRepository.findByHash(id);
 		if (url != null) {
 			//DetailedStats detailedStats = ClickUtils.fromMapToChartParams(url, clickRepository.aggregateInfoByHash(id));
-			// TESTEO
+			// INICIO TESTEO
 			Map<String, Integer> data = new HashMap<String, Integer>();
 			data.put("Firefox", 5);
 			data.put("Chrome", 10);
@@ -95,12 +157,12 @@ public class PlainController {
 			Map<String, DetailedStats.ChartData> charts = new HashMap<String, DetailedStats.ChartData>();
 			charts.put("Browser", chartData);
 			DetailedStats detailedStats = new DetailedStats(url, charts);
-			//FIN TESTEO
+			// FIN TESTEO
 			model.addAttribute("detailedStats", detailedStats);
-			return "stats";
+			return DEFAULT_STATS_PATH;
 		} else {
-			model.addAttribute("errorCause", "Sorry, that shortened URL does not exist.");
-			return "error";
+			model.addAttribute("errorCause", DEFAULT_URL_NOT_FOUND_MESSAGE);
+			return DEFAULT_ERROR_PATH;
 		}
 	}
 }

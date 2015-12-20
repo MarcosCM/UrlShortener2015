@@ -79,6 +79,15 @@ $(document).ready(function() {
       authUsersSel.hide();
     }
   });
+
+  // Login buttons triggers
+  $.each($("[id$='LoginRedirect']"), function(){
+    $(this).click(function(){
+      // First: change the URL to go to
+      $(this).attr("href", $(this).attr("href") + $("#goToUrl").val());
+      // Then the browser will GET the URL
+    });
+  });
 });
 
 function setAuthButtonsTriggers(authMethods){

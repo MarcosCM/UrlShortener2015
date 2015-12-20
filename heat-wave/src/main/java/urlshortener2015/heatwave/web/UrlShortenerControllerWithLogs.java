@@ -103,7 +103,6 @@ public class UrlShortenerControllerWithLogs {
 			ShortURL su = new ShortURL(id, url, new URI(id), new Date(System.currentTimeMillis()),
 					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads, users);
 			return shortURLRepository.insert(su);
-
 		}
 		else {
 			return null;
@@ -112,9 +111,7 @@ public class UrlShortenerControllerWithLogs {
 
 	public static ResponseEntity<?> createSuccessfulRedirectToStatisticJson(ShortURL url, ClickRepository clickRepository) {
 		// En l tienes todos los datos de la shortURL
-		BasicStats stats = new BasicStats(clickRepository.countByHash(url.getHash()), url.getTarget(),
-				url.getDate().toString());
-		//String json = stats.toString();
+		BasicStats stats = new BasicStats(clickRepository.countByHash(url.getHash()), url.getTarget(), url.getDate().toString());
 		return new ResponseEntity<>(stats, HttpStatus.OK);
 	}
 	
@@ -199,6 +196,7 @@ public class UrlShortenerControllerWithLogs {
 		Boolean ads;
 		if (enableAd != null && enableAd) ads = new Boolean(true);
 		else ads = new Boolean(false);
+		
 		if (customTag != null && !customTag.equals("")) {
 			ShortURL urlConID = shortURLRepository.findByHash(customTag);
 			if (urlConID != null) {
@@ -215,9 +213,6 @@ public class UrlShortenerControllerWithLogs {
 					messageError += ":" + lista.get(i).getRecomendacion();
 				}
 				throw new Error400Response(messageError);
-
-				// return new ResponseEntity<>(urlconID,
-				// HttpStatus.BAD_REQUEST);
 			}
 		}
 		ShortURL su = UrlShortenerControllerWithLogs.createAndSaveIfValid(url, customTag, ads, users, shortURLRepository);

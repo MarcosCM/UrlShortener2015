@@ -14,10 +14,15 @@ eclipse {
    }
 }
 
+apply plugin: 'java'
 apply plugin: 'eclipse-wtp'
+apply plugin: 'idea'
 apply plugin: 'spring-boot'
 
 mainClassName = 'urlshortener2015.heatwave.Application'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
     // Provides the production database
@@ -36,12 +41,16 @@ dependencies {
     compile 'org.glassfish.jersey.core:jersey-server:2.13'
     
     compile 'jstl:jstl:1.2'
-    
     compile 'org.apache.tomcat.embed:tomcat-embed-jasper:8.0.28'
     
     compile 'commons-codec:commons-codec:1.9'
     compile 'commons-validator:commons-validator:1.4.0'
-	compile 'com.google.guava:guava:17.0'
+    compile 'com.google.guava:guava:17.0'
+
+	// Login APIs
+	// compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.social:spring-social-facebook:2.0.3.RELEASE")
+    compile("org.springframework.social:spring-social-web:1.1.4.RELEASE")
 
     // Testing framework
     testCompile 'org.springframework.boot:spring-boot-starter-test'    
