@@ -82,6 +82,8 @@ public class UrlShortenerControllerWithLogs {
 				id = customTag;
 			}
 
+			/*
+			 * Parte Suficiente F3
 			// Se hace un get de la url a acortar para comprobar que la url no es una redireccion a si misma.
 			Client client = ClientBuilder.newClient();
 			Response response = client.target(url).request().get();
@@ -95,6 +97,7 @@ public class UrlShortenerControllerWithLogs {
 					throw new Error400Response("La URL a acortar no es valida.");
 				}
 			}
+			*/
 			
 			// Si ya existe devolver null
 			ShortURL su = new ShortURL(id, url, new URI(id), new Date(System.currentTimeMillis()),
