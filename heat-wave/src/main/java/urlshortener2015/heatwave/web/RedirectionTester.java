@@ -35,7 +35,7 @@ public class RedirectionTester {
 	 * 5 redirecciones.
 	 */
 	//@Async
-	@Scheduled(fixedRate=T*1000)
+	//@Scheduled(fixedRate=T*1000)
 	public void testUrls(){
 		
 		Client client = ClientBuilder.newClient();

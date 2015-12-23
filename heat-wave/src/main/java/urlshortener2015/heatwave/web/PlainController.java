@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import urlshortener2015.heatwave.entities.DetailedStats;
-import urlshortener2015.heatwave.entities.BasicStats;
 import urlshortener2015.heatwave.entities.ShortURL;
 import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ClickRepository;
@@ -82,6 +81,15 @@ public class PlainController {
 		}
 	}
 	
+	@RequestMapping(value = "/connect/facebookConnected", method = RequestMethod.GET)
+	public String connectedToFacebook(HttpServletRequest request, Model model){
+		model.addAttribute("targetURL", facebook.userOperations().getUserProfile().getEmail());
+		model.addAttribute("countDown", DEFAULT_COUNTDOWN);
+		model.addAttribute("advertisement", DEFAULT_AD_PATH);
+		model.addAttribute("enableAds", true);
+		return "redirecting";
+	}
+	
 	/**
 	 * Autenticacion logeando a traves de Facebook
 	 * @param id Hash o etiqueta de la URL
@@ -93,6 +101,7 @@ public class PlainController {
 	@RequestMapping(value = "/login/facebook/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET)
 	public String facebookRedirectTo(@PathVariable String id, HttpServletRequest request, Model model){
 		ShortURL url = shortURLRepository.findByHash(id);
+		logger.info("is Facebook obj null? " + (facebook == null));
 		if (url != null){
 			// The user will be redirected
 			model.addAttribute("targetURL", url.getTarget());
@@ -105,16 +114,19 @@ public class PlainController {
 						String userMail = facebook.userOperations().getUserProfile().getEmail();
 						for(String mail : mails){
 							if (mail.equals(userMail)){
+								logger.info("The user IS in the users list");
 								model.addAttribute("enableAds", false);
 								return DEFAULT_REDIRECTING_PATH;
 							}
 						}
 					}
 					// There is no Facebook users in that URL or the user is not in its Facebook users
+					logger.info("The user IS NOT in the users list");
 					model.addAttribute("enableAds", true);
 					return DEFAULT_REDIRECTING_PATH;
 				}
 				else{
+					logger.info("User DOES NOT authorize the app");
 					// Facebook user does not authorize the app
 					// redirect to request mapped by ConnectController
 					return "redirect:/connect/facebook";

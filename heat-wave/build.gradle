@@ -48,7 +48,9 @@ dependencies {
     compile 'com.google.guava:guava:17.0'
 
 	// Login APIs
-	// compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+	//compile("org.springframework.social:spring-social-config:1.1.0.RELEASE")
+	//compile("org.springframework.social:spring-social-core:1.1.0.RELEASE")
+	//compile("org.springframework.social:spring-social-security:1.1.0.RELEASE")
     compile("org.springframework.social:spring-social-facebook:2.0.3.RELEASE")
     compile("org.springframework.social:spring-social-web:1.1.4.RELEASE")
 
