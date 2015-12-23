@@ -45,15 +45,25 @@ import urlshortener2015.heatwave.utils.SuggestionUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 
 @RestController
-public class UrlShortenerControllerWithLogs {
+public class MainController {
 
-	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
+	private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
 	@Autowired
 	private ShortURLRepository shortURLRepository;
 	
 	@Autowired
 	private ClickRepository clickRepository;
+	
+	// Times
+	public static final int DEFAULT_COUNTDOWN = 10;
+	// Paths
+	public static final String DEFAULT_AD_PATH = "./images/header.png";
+	public static final String DEFAULT_REDIRECTING_PATH = "redirecting";
+	public static final String DEFAULT_STATS_PATH = "stats";
+	public static final String DEFAULT_ERROR_PATH = "error";
+	// Error messages
+	public static final String DEFAULT_URL_NOT_FOUND_MESSAGE = "That URL does not exist";
 
 	/**
 	 * Guarda un click hecho sobre una URL acortada
@@ -160,7 +170,7 @@ public class UrlShortenerControllerWithLogs {
 	public ResponseEntity<ArrayList<Suggestion>> sugerencias(@RequestParam(value = "url", required = false) String url,
 			@RequestParam(value = "customTag", required = false) String customTag) {
 		logger.info("Getting suggestions for the custom tag: " + customTag);
-		ArrayList<Suggestion> lista = UrlShortenerControllerWithLogs.listaSugerencias(customTag, shortURLRepository);
+		ArrayList<Suggestion> lista = MainController.listaSugerencias(customTag, shortURLRepository);
 		return new ResponseEntity<>(lista, HttpStatus.OK);
 	}
 
@@ -169,7 +179,7 @@ public class UrlShortenerControllerWithLogs {
 		logger.info("Requested redirection with hash " + id);
 		ShortURL l = shortURLRepository.findByHash(id);
 		if (l != null) {
-			return UrlShortenerControllerWithLogs.createSuccessfulRedirectToStatisticJson(l, clickRepository);
+			return MainController.createSuccessfulRedirectToStatisticJson(l, clickRepository);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -207,7 +217,7 @@ public class UrlShortenerControllerWithLogs {
 					SugerenciaSufijo2 = SuggestionUtils.sugerenciaSufijos(shortURLRepository, customTag);
 				}
 				// las recomendaciones se separan con el separador ":"
-				ArrayList<Suggestion> lista = UrlShortenerControllerWithLogs.listaSugerencias(customTag, shortURLRepository);
+				ArrayList<Suggestion> lista = MainController.listaSugerencias(customTag, shortURLRepository);
 				String messageError = "La URL a personalizar ya existe";
 				for (int i=0; i<lista.size(); i++){
 					messageError += ":" + lista.get(i).getRecomendacion();
@@ -215,7 +225,7 @@ public class UrlShortenerControllerWithLogs {
 				throw new Error400Response(messageError);
 			}
 		}
-		ShortURL su = UrlShortenerControllerWithLogs.createAndSaveIfValid(url, customTag, ads, users, shortURLRepository);
+		ShortURL su = MainController.createAndSaveIfValid(url, customTag, ads, users, shortURLRepository);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());

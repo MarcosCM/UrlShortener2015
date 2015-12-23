@@ -88,6 +88,9 @@ $(document).ready(function() {
       // Then the browser will GET the URL
     });
   });*/
+  $("#facebookLogin").submit(function(event){
+    $(this).attr('action', $(this).attr('action') + "/" + $("#goToUrl").val());
+  });
 });
 
 function setAuthButtonsTriggers(authMethods){

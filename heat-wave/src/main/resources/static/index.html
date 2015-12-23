@@ -27,8 +27,8 @@
 					 			<input type="checkbox" aria-label="..." name="enableAd" id="enableAd">
 					 		</span>
 					 		<input readonly type="text" class="form-control" value="The shortened URL will show an advertisement">
-					 	</div><!-- /input-group -->
-				  	</div><!-- /.col-lg-4 -->
+					 	</div>
+				  	</div>
 				  	<div id="authUsers" class="input-group input-group-lg col-sm-offset-4 col-sm-4"></div>
 					<br>
 					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
@@ -37,18 +37,18 @@
 								<input id="checkPersonalizar" onclick="personalizar()" type="checkbox" aria-label="...">
 							</span>
 							<input readonly type="text" class="form-control" value="I want a custom URL tag">
-						</div><!-- /input-group -->
-					</div><!-- /.col-lg-4 -->
+						</div>
+					</div>
 					<br>
 					<div id="divPersonalizar" style="visibility: hidden;" class="input-group input-group-lg col-sm-offset-4 col-sm-4">
 						<div class="input-group">
 							<span id="divPersonalizar" class="input-group-addon" id="basic-addon3">http://shorturl.es/</span>
 							<input type="text" name="customTag" class="form-control" id="urlPerson" onkeyup="comprobarSugerencias(this)" aria-describedby="basic-addon3">
-						</div><!-- /input-group -->
+						</div>
 						<br>
 						<div id="sugerencia"></div>
 						<div id="sugerencias" class="btn-group" role="group" /></div>
-					</div><!-- /.col-lg-4 -->
+					</div>
 				</form>
 			</div>
 		</div>
@@ -72,10 +72,9 @@
 		        	<a id="twitterLoginRedirect" href="/login/twitter/" class="btn btn-lg btn-info btn-block">Twitter</a>
 		        </div>
 		        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-		        	<!--<a id="facebookLoginRedirect" href="/login/facebook/" class="btn btn-lg btn-primary btn-block">Facebook</a>-->
-		        	<form action="/connect/facebook" method="POST">
+		        	<form id="facebookLogin" action="/connect/facebook" method="POST">
 		        		<input type="hidden" name="scope" value="email">
-		        		<input type="submit" id="facebookLoginRedirect" class="btn btn-lg btn-primary btn-block">Facebook</a>
+		        		<button type="submit" id="facebookLoginRedirect" class="btn btn-lg btn-primary btn-block">Facebook</button>
 		        	</form>
 		        </div>
 	        </div>
@@ -83,7 +82,7 @@
 	        	<br>
 	        	<p class="lead text-center">Code of the URL to go to (or custom tag)</p>
 	        	<div class="text-center">
-	        		<input id="goToUrl" type="text" placeholder="Example: 4l0dcef">
+	        		<input type="text" id="goToUrl" name="goToUrl" placeholder="Example: 4l0dcef">
 	        	</div>
 	        </div>
     	</div>
