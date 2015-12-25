@@ -22,8 +22,9 @@ $(document).ready(function() {
         console.log(jqXHR);
         var obj = jQuery.parseJSON( jqXHR.responseText );
         var mensaje=obj.message;
-	if(mensaje.localeCompare("La URL a personalizar ya existe")==0 ){
-		$("#result").html( "<div class='alert alert-danger lead'>La URL a personalizar ya existe</div>");
+	if(mensaje.localeCompare("La URL a personalizar ya existe")==0 || 
+  mensaje.localeCompare("La URL a acortar no es válida")==0){
+		$("#result").html( "<div class='alert alert-danger lead'>"+mensaje+"</div>");
          	document.getElementById("sugerencias").style.display = "inline";
          	document.getElementById("sugerencia").style.display = "inline";
 		mostrarSugerencias();

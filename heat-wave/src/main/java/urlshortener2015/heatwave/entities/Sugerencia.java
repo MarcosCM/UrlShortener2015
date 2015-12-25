@@ -12,5 +12,8 @@ public class Sugerencia {
 	public void setRecomendacion(String recomendacion) {
 		this.recomendacion = recomendacion;
 	}
-	
+	@Override
+	public String toString(){
+		return recomendacion;
+	}
 }
