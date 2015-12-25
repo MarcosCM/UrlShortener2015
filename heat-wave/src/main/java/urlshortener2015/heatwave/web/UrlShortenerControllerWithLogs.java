@@ -150,25 +150,7 @@ public class UrlShortenerControllerWithLogs {
 
 			lista.add(new Sugerencia(sugerenciaSufijo2));
 			lista.add(new Sugerencia(sugerenciaSufijo));
-			RestTemplate restTemplate = new RestTemplate();
-			try {
-				ResponseEntity<String> response = restTemplate.getForEntity("http://words.bighugelabs.com/api/2/c302f07e3593264f58a7366800330462/"
-								+ customTag + "/json", String.class);
-				String body = response.getBody();
-				// a partir de la posicion 5 estan los resultados
-				// se anaden dos sugerencias si la api ha devuelto resultados
-				// son en posiciones impares (en las pares hay comas)
-				int sugerenciasIngles=0;
-				int i=5;
-				while(sugerenciasIngles<4){
-					if(shortURLRepository.findByHash(body.split("\"")[i])==null){
-						lista.add(new Sugerencia(body.split("\"")[i]));
-						sugerenciasIngles++;
-					}
-					// son en posiciones impares (en las pares hay comas)
-					i+=2;
-				}
-			} catch (Exception a) {}
+			lista=Sugerencias.sugerenciasFromAPIs(lista, customTag, shortURLRepository);
 		}
 		return lista;
 	}
@@ -235,6 +217,7 @@ public class UrlShortenerControllerWithLogs {
 		else ads = new Boolean(false);
 		if (customTag != null && !customTag.equals("")) {
 			ShortURL urlConID = shortURLRepository.findByHash(customTag);
+
 			if (urlConID != null) {
 				//la url personalizada ya existe
 				String messageError = "La URL a personalizar ya existe";
@@ -245,10 +228,12 @@ public class UrlShortenerControllerWithLogs {
 				// HttpStatus.BAD_REQUEST);
 			}
 		}
+
 		ShortURL su = UrlShortenerControllerWithLogs.createAndSaveIfValid(url, customTag, ads, shortURLRepository);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
+
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 		} else {
 			throw new Error400Response("La URL a acortar no es válida");
