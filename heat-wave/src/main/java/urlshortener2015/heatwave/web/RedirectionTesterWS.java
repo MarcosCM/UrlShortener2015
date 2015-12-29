@@ -9,37 +9,42 @@ import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.ws.server.endpoint.annotation.Endpoint;
+import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
+import org.springframework.ws.server.endpoint.annotation.RequestPayload;
+import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import urlshortener2015.heatwave.entities.ShortURL;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
 
-@Service
-public class RedirectionTester {
+import io.spring.guides.gs_producing_web_service.TestYourURLS;
+import io.spring.guides.gs_producing_web_service.URLSTested;
+
+@Endpoint
+public class RedirectionTesterWS {
 	
-	/**
+	/*
 	 * Numero maximo de redirecciones
 	 */
 	private static final int NUM_MAX_REDIRECCIONES = 5;
 	
-	/**
-	 * Periodo de la tarea de actualizar las URLs
-	 */
-	private static final long T = 5*60; //5 minutos
-	
+	private static final String TEST_URI = "";
+
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
 	
 	/**
-	 * Se comprueba periodicamente que las URLs no tienen mas de
+	 * Se comprueba periodicamente que las Urls no tienen mas de
 	 * 5 redirecciones.
 	 */
-	//@Async
-	//@Scheduled(fixedRate=T*1000)
-	public void testUrls(){
+	@PayloadRoot(namespace = TEST_URI, localPart = "TestYourURLs")
+	@ResponsePayload
+	public URLSTested testUrls(@RequestPayload TestYourURLS request){
+		
+		URLSTested respuesta = new URLSTested();
 		
 		Client client = ClientBuilder.newClient();
-		Response response;
+		Response response = null;
 		
 		// Se obtienen las URLs de la base de datos
 		List<ShortURL> URLS = shortURLRepository.findAll();
@@ -47,7 +52,12 @@ public class RedirectionTester {
 		for(ShortURL url : URLS){
 			String urlTarget = url.getTarget();
 			for(int i=0; i<=NUM_MAX_REDIRECCIONES; i++){
-				response = client.target(urlTarget).request().get();
+				try{
+					response = client.target(urlTarget).request().head();
+				}catch(Exception e){
+					shortURLRepository.mark(url, false);
+					break;// Poner 404 en la base de datos
+				}
 				// Si el codigo es un 3xx
 				if (response.getStatus() / 100 == 3){
 					//Alcanzado el limite de redirecciones.
@@ -67,5 +77,7 @@ public class RedirectionTester {
 				}
 			}
 		}
+		
+		return respuesta;
 	}
 }

@@ -8,9 +8,9 @@ $(document).ready(function() {
   // Form submit trigger
   $("#shortener").submit(function(event) {
     if (timer != null) {
-      clearTimeout(timer);
-      // Remove inputs to prevent the form to send unneeded data
-      if (authUsersSel.is(":not(:checked)")) authUsersSel.empty();
+	    clearTimeout(timer);
+	    // Remove inputs to prevent the form to send unneeded data
+	    if (authUsersSel.is(":not(:checked)")) authUsersSel.empty();
     }
     $.ajax({
       type : "POST",
@@ -29,25 +29,16 @@ $(document).ready(function() {
       error : function(jqXHR) {
         var obj = jQuery.parseJSON( jqXHR.responseText );
         var mensaje=obj.message;
-        var atributos= mensaje.split(":");
-        if(atributos.length>1){
-          $("#result").html( "<div class='alert alert-danger lead'>" +  atributos[0] + "</div>");
-          var sugerencias=1;
-          $("#sugerencia").html( "<h4>Sugerencias, elige la que más te guste:<h4> </br>");
-          var sugerenciasBotones="";
-          while(sugerencias<atributos.length){
-            sugerenciasBotones+="<button id='"+atributos[sugerencias]+"' onclick='elegirSugerencia(this.id)' type='button' class='btn btn-link'>"+atributos[sugerencias]+" </button>";
-            sugerencias=sugerencias+1;
-          }
-          $("#sugerencias").html( sugerenciasBotones);
-
-          document.getElementById("sugerencias").style.display = "inline";
-          document.getElementById("sugerencia").style.display = "inline";
-        }
+		if(mensaje.localeCompare("La URL a personalizar ya existe")==0 || mensaje.localeCompare("La URL a acortar no es válida")==0){
+			$("#result").html( "<div class='alert alert-danger lead'>"+mensaje+"</div>");
+	        document.getElementById("sugerencias").style.display = "inline";
+	        document.getElementById("sugerencia").style.display = "inline";
+			mostrarSugerencias();
+		}
         else{
-          $("#result").html( "<div class='alert alert-danger lead'>" +  atributos[0] + "</div>");
-          document.getElementById("sugerencias").style.display = "none";
-          document.getElementById("sugerencia").style.display = "none";
+	        $("#result").html( "<div class='alert alert-danger lead'>Error de conexión</div>");
+	        document.getElementById("sugerencias").style.display = "none";
+	        document.getElementById("sugerencia").style.display = "none";
         }
       }
     });
@@ -114,14 +105,8 @@ function elegirSugerencia (id) {
   document.getElementById("urlPerson").value=id;
 }
 
-var timer;
-function comprobarSugerencias(input) {
-  if ($(input).val().length){
-    if (timer != null) {
-      clearTimeout(timer);
-    }
-    // esperamos un segundo
-    timer = setTimeout(function(){
+function mostrarSugerencias () {
+//document.getElementById("urlPerson").value=id;
       document.getElementById("sugerencias").style.display = "none";
       $("#sugerencia").html( "<img src='./images/ring.svg' alt='Cargando'></br>");
 
@@ -155,7 +140,17 @@ function comprobarSugerencias(input) {
         document.getElementById("sugerencias").style.display = "none";
         document.getElementById("sugerencia").style.display = "none";
       });
-    }, 1000);
+}
+
+var timer;
+function comprobarSugerencias(input) {
+  $("#sugerencia").html( "<img src='./images/ring.svg' alt='Cargando'></br>");
+  if ($(input).val().length>0){
+    if (timer != null) {
+      clearTimeout(timer);
+    }
+    // esperamos un segundo
+    timer = setTimeout(mostrarSugerencias(), 400);
   }
   else {
     clearTimeout(timer);

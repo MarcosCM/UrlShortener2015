@@ -95,6 +95,8 @@ public class MainController {
 				id = customTag;
 			}
 
+			/*
+			 * Parte Suficiente F3
 			// Se hace un get de la url a acortar para comprobar que la url no es una redireccion a si misma.
 			Client client = ClientBuilder.newClient();
 			Response response = client.target(url).request().get();
@@ -108,6 +110,7 @@ public class MainController {
 					throw new Error400Response("La URL a acortar no es valida.");
 				}
 			}
+			*/
 			
 			// Si ya existe devolver null
 			ShortURL su = new ShortURL(id, url, new URI(id), new Date(System.currentTimeMillis()),
@@ -137,25 +140,7 @@ public class MainController {
 
 			lista.add(new Suggestion(sugerenciaSufijo2));
 			lista.add(new Suggestion(sugerenciaSufijo));
-			RestTemplate restTemplate = new RestTemplate();
-			try {
-				ResponseEntity<String> response = restTemplate.getForEntity("http://words.bighugelabs.com/api/2/c302f07e3593264f58a7366800330462/"
-								+ customTag + "/json", String.class);
-				String body = response.getBody();
-				// a partir de la posicion 5 estan los resultados
-				// se anaden dos sugerencias si la api ha devuelto resultados
-				// son en posiciones impares (en las pares hay comas)
-				int sugerenciasIngles=0;
-				int i=5;
-				while(sugerenciasIngles<4){
-					if(shortURLRepository.findByHash(body.split("\"")[i])==null){
-						lista.add(new Suggestion(body.split("\"")[i]));
-						sugerenciasIngles++;
-					}
-					// son en posiciones impares (en las pares hay comas)
-					i+=2;
-				}
-			} catch (Exception a) {}
+			lista = SuggestionUtils.sugerenciasFromAPIs(lista, customTag, shortURLRepository);
 		}
 		return lista;
 	}
@@ -209,26 +194,20 @@ public class MainController {
 		
 		if (customTag != null && !customTag.equals("")) {
 			ShortURL urlConID = shortURLRepository.findByHash(customTag);
+
 			if (urlConID != null) {
-				// la url personalizada ya existe
-				String SugerenciaSufijo = SuggestionUtils.sugerenciaSufijos(shortURLRepository, customTag);
-				String SugerenciaSufijo2 = SugerenciaSufijo;
-				while (SugerenciaSufijo2.equals(SugerenciaSufijo)) {
-					SugerenciaSufijo2 = SuggestionUtils.sugerenciaSufijos(shortURLRepository, customTag);
-				}
-				// las recomendaciones se separan con el separador ":"
-				ArrayList<Suggestion> lista = MainController.listaSugerencias(customTag, shortURLRepository);
+				//la url personalizada ya existe
 				String messageError = "La URL a personalizar ya existe";
-				for (int i=0; i<lista.size(); i++){
-					messageError += ":" + lista.get(i).getRecomendacion();
-				}
+				
 				throw new Error400Response(messageError);
 			}
 		}
+		
 		ShortURL su = MainController.createAndSaveIfValid(url, customTag, ads, users, shortURLRepository);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
+
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 		} else {
 			throw new Error400Response("La URL a acortar no es válida");
@@ -241,5 +220,4 @@ public class MainController {
 	public BasicStats respuestaSocket(HelloMessage infoQueLlega) throws Exception {
 		return new BasicStats(new Long(1), "", "");
 	}
-
 }

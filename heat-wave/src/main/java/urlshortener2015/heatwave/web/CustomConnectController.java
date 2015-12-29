@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
+import org.springframework.social.connect.web.ConnectController;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.twitter.api.Twitter;
 import org.springframework.stereotype.Controller;
@@ -26,9 +27,9 @@ import urlshortener2015.heatwave.utils.ShortURLUtils;
  */
 @Controller
 @RequestMapping("/connect")
-public class ConnectController extends org.springframework.social.connect.web.ConnectController {
+public class CustomConnectController extends ConnectController {
 
-	private static final Logger logger = LoggerFactory.getLogger(ConnectController.class);
+	private static final Logger logger = LoggerFactory.getLogger(CustomConnectController.class);
 	
 	@Autowired
 	private Facebook facebook;
@@ -40,7 +41,7 @@ public class ConnectController extends org.springframework.social.connect.web.Co
 	private ShortURLRepository shortURLRepository;
 	
     @Inject
-    public ConnectController(ConnectionFactoryLocator connectionFactoryLocator, ConnectionRepository connectionRepository) {
+    public CustomConnectController(ConnectionFactoryLocator connectionFactoryLocator, ConnectionRepository connectionRepository) {
         super(connectionFactoryLocator, connectionRepository);
     }
     
