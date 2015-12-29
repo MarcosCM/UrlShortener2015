@@ -75,7 +75,7 @@ public class MainController {
 	public static void createAndSaveClick(String hash, String browser, String platform, String ip, ClickRepository clickRepository) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()), browser, platform, ip, null);
 		cl = clickRepository.insert(cl);
-		logger.info(cl != null ? "[" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
+		logger.info(cl != null ? "Click on [" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
 	}
 
 	/**

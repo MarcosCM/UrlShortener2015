@@ -81,15 +81,11 @@ $(document).ready(function() {
   });
 
   // Login buttons triggers
-  /*$.each($("[id$='LoginRedirect']"), function(){
-    $(this).click(function(){
-      // First: change the URL to go to
-      $(this).attr("href", $(this).attr("href") + $("#goToUrl").val());
-      // Then the browser will GET the URL
+  $("[id$=Login]").each(function(){
+    $(this).submit(function(event){
+      $(this).attr('action', $(this).attr('action') + "/" + $("#goToUrl").val());
+      // Submit
     });
-  });*/
-  $("#facebookLogin").submit(function(event){
-    $(this).attr('action', $(this).attr('action') + "/" + $("#goToUrl").val());
   });
 });
 

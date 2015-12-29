@@ -47,11 +47,12 @@ dependencies {
     compile 'commons-validator:commons-validator:1.4.0'
     compile 'com.google.guava:guava:17.0'
 
-	// Login APIs
+	// Spring Social
 	//compile("org.springframework.social:spring-social-config:1.1.0.RELEASE")
 	//compile("org.springframework.social:spring-social-core:1.1.0.RELEASE")
 	//compile("org.springframework.social:spring-social-security:1.1.0.RELEASE")
     compile("org.springframework.social:spring-social-facebook:2.0.3.RELEASE")
+    compile("org.springframework.social:spring-social-twitter:1.1.0.RELEASE")
     compile("org.springframework.social:spring-social-web:1.1.4.RELEASE")
 
     // Testing framework

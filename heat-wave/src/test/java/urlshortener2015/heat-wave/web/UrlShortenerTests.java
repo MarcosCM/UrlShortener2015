@@ -90,7 +90,7 @@ public class UrlShortenerTests {
 	private ClickRepository clickRespository;
 
 	@InjectMocks
-	private UrlShortenerControllerWithLogs urlShortener;
+	private MainController urlShortener;
 
 	@Before
 	public void setup() {

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.twitter.api.Twitter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,9 @@ public class ConnectController extends org.springframework.social.connect.web.Co
 	private Facebook facebook;
 	
 	@Autowired
+	private Twitter twitter;
+	
+	@Autowired
 	private ShortURLRepository shortURLRepository;
 	
     @Inject
@@ -40,25 +44,36 @@ public class ConnectController extends org.springframework.social.connect.web.Co
         super(connectionFactoryLocator, connectionRepository);
     }
     
-    @RequestMapping(value = "/facebook/{id:(?!link|!stadistics|index).*}", method = RequestMethod.POST)
-    protected RedirectView connectFacebook(@PathVariable String id, NativeWebRequest webRequest){
-    	return super.connect("facebook", webRequest);
+    @RequestMapping(value = "/{providerId:facebook|twitter}/{id:(?!link|!stadistics|index).*}", method = RequestMethod.POST)
+    protected RedirectView connect(@PathVariable("providerId") String providerId, @PathVariable("id") String id, NativeWebRequest request){
+    	logger.info("POST TO /connect/"+providerId+"/"+id);
+    	return super.connect(providerId, request);
     }
     
-    @RequestMapping(value = "/facebook/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET)
-    protected String connect(@PathVariable String id, NativeWebRequest webRequest, Model model){
+    @RequestMapping(value = "/{providerId:facebook|twitter}/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET)
+    protected String connect(@PathVariable("providerId") String providerId, @PathVariable("id") String id, NativeWebRequest webRequest, Model model){
+    	logger.info("GET TO /connect/"+providerId+"/"+id);
     	super.connectionStatus(webRequest, model);
     	ShortURL url = shortURLRepository.findByHash(id);
     	model.addAttribute("targetURL", url.getTarget());
 		model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
 		model.addAttribute("advertisement", MainController.DEFAULT_AD_PATH);
-		logger.info("is Facebook obj null? " + (facebook == null));
     	if (url.getAds()){
-    		if (facebook.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInFacebookList(url, facebook));
-    		else model.addAttribute("enableAds", true);
+    		switch(providerId){
+	    		case "facebook":
+	    			if (facebook.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, facebook));
+	    			else model.addAttribute("enableAds", true);
+	    			break;
+	    		case "twitter":
+	    			if (twitter.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, twitter));
+	    			else model.addAttribute("enableAds", true);
+	    			break;
+    			default:
+    				break;
+    		}
     	}
     	else model.addAttribute("enableAds", false);
-    	return connectedView("facebook", id);
+    	return connectedView(providerId, id);
     }
 
     protected String connectedView(String providerId, String url) {
