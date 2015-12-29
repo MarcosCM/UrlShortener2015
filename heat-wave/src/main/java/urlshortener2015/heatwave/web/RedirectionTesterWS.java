@@ -24,7 +24,7 @@ import io.spring.guides.gs_producing_web_service.URLSTested;
 public class RedirectionTesterWS {
 	
 	/*
-	 * Número máximo de redirecciones
+	 * Numero maximo de redirecciones
 	 */
 	private static final int NUM_MAX_REDIRECCIONES = 5;
 	
@@ -34,7 +34,7 @@ public class RedirectionTesterWS {
 	protected ShortURLRepository shortURLRepository;
 	
 	/**
-	 * Se comprueba periódicamente que las Urls no tienen más de
+	 * Se comprueba periodicamente que las Urls no tienen mas de
 	 * 5 redirecciones.
 	 */
 	@PayloadRoot(namespace = TEST_URI, localPart = "TestYourURLs")
@@ -58,9 +58,9 @@ public class RedirectionTesterWS {
 					shortURLRepository.mark(url, false);
 					break;// Poner 404 en la base de datos
 				}
-				// Si el código es un 3xx
+				// Si el codigo es un 3xx
 				if (response.getStatus() / 100 == 3){
-					//Alcanzado el límite de redirecciones.
+					//Alcanzado el limite de redirecciones.
 					if(i == NUM_MAX_REDIRECCIONES){
 						shortURLRepository.mark(url, false);
 						break;// Poner 404 en la base de datos
@@ -69,7 +69,7 @@ public class RedirectionTesterWS {
 						urlTarget = response.getLocation().toString();
 					}
 				}
-				// Si el código no es un 3xx no es redirección
+				// Si el codigo no es un 3xx no es redireccion
 				else{
 					// Si la URL estaba como no correcta en la base de datos se activa.
 					shortURLRepository.mark(url, true);

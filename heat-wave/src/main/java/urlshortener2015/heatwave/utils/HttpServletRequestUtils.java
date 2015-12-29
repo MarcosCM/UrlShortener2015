@@ -1,8 +1,19 @@
 package urlshortener2015.heatwave.utils;
 
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HttpServletRequestUtils {
+	
+	private static final Logger logger = LoggerFactory.getLogger(HttpServletRequestUtils.class);
 	
 	public static String getRemoteAddr(HttpServletRequest request){
 		return request != null ? request.getRemoteAddr() : null;
@@ -41,5 +52,23 @@ public class HttpServletRequestUtils {
 	public static String getCountry(HttpServletRequest request){
 		//String ip = HttpServletRequestUtils.getRemoteAddr(request);
 		return null;
+	}
+	
+	public static Map<String, List<String>> getUsers(HttpServletRequest request){
+		Enumeration<String> paramNames = request.getParameterNames();
+		Map<String, List<String>> res = new HashMap<String, List<String>>();
+		String paramName, currentParam;
+		while (paramNames.hasMoreElements()){
+			paramName = paramNames.nextElement();
+			logger.info("Checking param: " + paramName);
+			// users["gmail"][]
+			if (paramName.startsWith("users[")){
+				// gmail
+				currentParam = paramName.substring(paramName.indexOf("[") + 2, paramName.indexOf("]") - 1);
+				res.put(currentParam, Arrays.asList(request.getParameterValues(paramName)));
+			}
+		}
+		
+		return res;
 	}
 }

@@ -24,11 +24,12 @@
 					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
 						<div class="input-group">
 					 		<span class="input-group-addon">
-					 			<input type="checkbox" aria-label="..." name="disableAd">
+					 			<input type="checkbox" aria-label="..." name="enableAd" id="enableAd">
 					 		</span>
-					 		<input readonly type="text" class="form-control" value="The shortened URL will not show an advertisement">
-					 	</div><!-- /input-group -->
-				  	</div><!-- /.col-lg-4 -->
+					 		<input readonly type="text" class="form-control" value="The shortened URL will show an advertisement">
+					 	</div>
+				  	</div>
+				  	<div id="authUsers" class="input-group input-group-lg col-sm-offset-4 col-sm-4"></div>
 					<br>
 					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
 						<div class="input-group">
@@ -36,18 +37,18 @@
 								<input id="checkPersonalizar" onclick="personalizar()" type="checkbox" aria-label="...">
 							</span>
 							<input readonly type="text" class="form-control" value="I want a custom URL tag">
-						</div><!-- /input-group -->
-					</div><!-- /.col-lg-4 -->
+						</div>
+					</div>
 					<br>
 					<div id="divPersonalizar" style="visibility: hidden;" class="input-group input-group-lg col-sm-offset-4 col-sm-4">
 						<div class="input-group">
-							<span id="divPersonalizar" class="input-group-addon" id="basic-addon3">http://localhost:8080/</span>
-							<input type="text"  name="customTag" class="form-control" id="urlPerson" onkeyup="comprobarSugerencias(this)" aria-describedby="basic-addon3">
-						</div><!-- /input-group -->
+							<span id="divPersonalizar" class="input-group-addon" id="basic-addon3">http://shorturl.es/</span>
+							<input type="text" name="customTag" class="form-control" id="urlPerson" onkeyup="comprobarSugerencias(this)" aria-describedby="basic-addon3">
+						</div>
 						<br>
 						<div id="sugerencia"></div>
 						<div id="sugerencias" class="btn-group" role="group" /></div>
-					</div><!-- /.col-lg-4 -->
+					</div>
 				</form>
 			</div>
 		</div>
@@ -59,6 +60,38 @@
 				</div>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-sm-offset-4 col-xs-12 col-sm-4 col-md-4 col-lg-4">
+				<p class="lead text-center">Log in to prevent ads</p>
+			</div>
+			<div class="col-sm-offset-4 col-xs-12 col-sm-4 col-md-4 col-lg-4">
+		        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+		        	<form id="googleLogin" action="/connect/google" method="POST">
+		        		<input type="hidden" name="scope" value="email">
+		        		<button type="submit" id="googleLoginRedirect" class="btn btn-lg btn-danger btn-block">Google</button>
+		        	</form>
+		        </div>
+		        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+		        	<form id="twitterLogin" action="/connect/twitter" method="POST">
+		        		<input type="hidden" name="scope" value="email">
+		        		<button type="submit" id="twitterLoginRedirect" class="btn btn-lg btn-info btn-block">Twitter</button>
+		        	</form>
+		        </div>
+		        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+		        	<form id="facebookLogin" action="/connect/facebook" method="POST">
+		        		<input type="hidden" name="scope" value="email">
+		        		<button type="submit" id="facebookLoginRedirect" class="btn btn-lg btn-primary btn-block">Facebook</button>
+		        	</form>
+		        </div>
+	        </div>
+	        <div class="col-sm-offset-4 col-xs-12 col-sm-4 col-md-4 col-lg-4">
+	        	<br>
+	        	<p class="lead text-center">Code of the URL to go to (or custom tag)</p>
+	        	<div class="text-center">
+	        		<input type="text" id="goToUrl" name="goToUrl" placeholder="Example: 4l0dcef">
+	        	</div>
+	        </div>
+    	</div>
 	</div>
 </body>
 </html>

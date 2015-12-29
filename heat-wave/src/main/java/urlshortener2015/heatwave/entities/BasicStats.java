@@ -1,6 +1,6 @@
 package urlshortener2015.heatwave.entities;
 
-public class Estadisticas {
+public class BasicStats {
 
 	Long clicks;
 	String url;
@@ -40,7 +40,7 @@ public class Estadisticas {
 		return resultado;
 	}
 
-	public Estadisticas(Long clicks, String url, String fechaCreacion) {
+	public BasicStats(Long clicks, String url, String fechaCreacion) {
 		this.clicks = clicks;
 		this.url = url;
 		this.fechaCreacion = fechaCreacion;

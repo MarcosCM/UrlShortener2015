@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 
 import javax.ws.rs.client.Client;
@@ -31,26 +33,37 @@ import org.springframework.web.client.RestTemplate;
 import com.google.common.hash.Hashing;
 
 import urlshortener2015.heatwave.entities.Click;
-import urlshortener2015.heatwave.entities.Estadisticas;
+import urlshortener2015.heatwave.entities.BasicStats;
 import urlshortener2015.heatwave.entities.HelloMessage;
 import urlshortener2015.heatwave.entities.ShortURL;
-import urlshortener2015.heatwave.entities.Sugerencia;
+import urlshortener2015.heatwave.entities.Suggestion;
 import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
-import urlshortener2015.heatwave.utils.Sugerencias;
+import urlshortener2015.heatwave.utils.HttpServletRequestUtils;
+import urlshortener2015.heatwave.utils.SuggestionUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 
 @RestController
-public class UrlShortenerControllerWithLogs {
+public class MainController {
 
-	private static final Logger logger = LoggerFactory.getLogger(UrlShortenerControllerWithLogs.class);
+	private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
 	@Autowired
 	private ShortURLRepository shortURLRepository;
 	
 	@Autowired
 	private ClickRepository clickRepository;
+	
+	// Times
+	public static final int DEFAULT_COUNTDOWN = 10;
+	// Paths
+	public static final String DEFAULT_AD_PATH = "./images/header.png";
+	public static final String DEFAULT_REDIRECTING_PATH = "redirecting";
+	public static final String DEFAULT_STATS_PATH = "stats";
+	public static final String DEFAULT_ERROR_PATH = "error";
+	// Error messages
+	public static final String DEFAULT_URL_NOT_FOUND_MESSAGE = "That URL does not exist";
 
 	/**
 	 * Guarda un click hecho sobre una URL acortada
@@ -62,7 +75,7 @@ public class UrlShortenerControllerWithLogs {
 	public static void createAndSaveClick(String hash, String browser, String platform, String ip, ClickRepository clickRepository) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()), browser, platform, ip, null);
 		cl = clickRepository.insert(cl);
-		logger.info(cl != null ? "[" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
+		logger.info(cl != null ? "Click on [" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
 	}
 
 	/**
@@ -74,7 +87,7 @@ public class UrlShortenerControllerWithLogs {
 	 * @throws URISyntaxException
 	 * @throws MalformedURLException
 	 */
-	public static ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads, ShortURLRepository shortURLRepository) throws MalformedURLException, URISyntaxException {
+	public static ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads, Map<String, List<String>> users, ShortURLRepository shortURLRepository) throws MalformedURLException, URISyntaxException {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
@@ -101,56 +114,33 @@ public class UrlShortenerControllerWithLogs {
 			
 			// Si ya existe devolver null
 			ShortURL su = new ShortURL(id, url, new URI(id), new Date(System.currentTimeMillis()),
-					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads);
+					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads, users);
 			return shortURLRepository.insert(su);
-
 		}
 		else {
 			return null;
 		}
 	}
-	
-	/**
-	 * Redirecciona a la pagina de estadisticas
-	 * @param url URL sobre la que generar las estadisticas
-	 * @return Pagina de estadisticas
-	 */
-	public static ResponseEntity<?> createSuccessfulRedirectToStatistic(ShortURL url, ClickRepository clickRepository) {
-		// En url tienes todos los datos de la shortURL
-		String resultado = "Número de clicks: " + clickRepository.countByHash(url.getHash());
-		resultado += "</br>Url: " + url.getTarget();
-		resultado += "</br>Fecha: " + url.getDate().toString();
-		String a = "<!DOCTYPE html>\n" + "<html>\n" + "<head>\n" + "    <title>Hello WebSocket</title>\n"
-				+ "    <script src='js/sockjs-0.3.4.js'></script>\n" + "    <script src='js/stomp.js'></script>\n"
-				+ "    <script src='js/webSocketImpl.js'></script>\n" + "</head>\n" + "<body onload='connect()'>\n"
-				+ "<noscript><h2 style='color: #ff0000'>Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable\n"
-				+ "    Javascript and reload this page!</h2></noscript>\n" + "<div>\n" + "    <div>\n" + "    </div>\n"
-				+ "    <div id='conversationDiv'>\n" + "<p id='response'>" + resultado + "</p>\n" + "    </div>\n"
-				+ "</div>\n" + "</body>\n" + "</html>";
-		return new ResponseEntity<>(a, HttpStatus.OK);
-	}
 
 	public static ResponseEntity<?> createSuccessfulRedirectToStatisticJson(ShortURL url, ClickRepository clickRepository) {
 		// En l tienes todos los datos de la shortURL
-		Estadisticas stats = new Estadisticas(clickRepository.countByHash(url.getHash()), url.getTarget(),
-				url.getDate().toString());
-		//String json = stats.toString();
+		BasicStats stats = new BasicStats(clickRepository.countByHash(url.getHash()), url.getTarget(), url.getDate().toString());
 		return new ResponseEntity<>(stats, HttpStatus.OK);
 	}
 	
-	private static ArrayList<Sugerencia> listaSugerencias(String customTag, ShortURLRepository shortURLRepository){
-		ArrayList<Sugerencia> lista = new ArrayList<Sugerencia>();
+	private static ArrayList<Suggestion> listaSugerencias(String customTag, ShortURLRepository shortURLRepository){
+		ArrayList<Suggestion> lista = new ArrayList<Suggestion>();
 		if (customTag != null && !customTag.equals("") && shortURLRepository.findByHash(customTag) != null) {
-			String sugerenciaSufijo = Sugerencias.sugerenciaSufijos(shortURLRepository, customTag);
+			String sugerenciaSufijo = SuggestionUtils.sugerenciaSufijos(shortURLRepository, customTag);
 			String sugerenciaSufijo2 = sugerenciaSufijo;
 
 			while (sugerenciaSufijo2.equals(sugerenciaSufijo)) {
-				sugerenciaSufijo2 = Sugerencias.sugerenciaSufijos(shortURLRepository, customTag);
+				sugerenciaSufijo2 = SuggestionUtils.sugerenciaSufijos(shortURLRepository, customTag);
 			}
 
-			lista.add(new Sugerencia(sugerenciaSufijo2));
-			lista.add(new Sugerencia(sugerenciaSufijo));
-			lista=Sugerencias.sugerenciasFromAPIs(lista, customTag, shortURLRepository);
+			lista.add(new Suggestion(sugerenciaSufijo2));
+			lista.add(new Suggestion(sugerenciaSufijo));
+			lista = SuggestionUtils.sugerenciasFromAPIs(lista, customTag, shortURLRepository);
 		}
 		return lista;
 	}
@@ -162,28 +152,11 @@ public class UrlShortenerControllerWithLogs {
 	 * @return Lista de sugerencias o vacio si la etiqueta no esta cogida
 	 */
 	@RequestMapping(value = "/sugerencias/recomendadas", method = RequestMethod.GET)
-	public ResponseEntity<ArrayList<Sugerencia>> sugerencias(@RequestParam(value = "url", required = false) String url,
+	public ResponseEntity<ArrayList<Suggestion>> sugerencias(@RequestParam(value = "url", required = false) String url,
 			@RequestParam(value = "customTag", required = false) String customTag) {
 		logger.info("Getting suggestions for the custom tag: " + customTag);
-		ArrayList<Sugerencia> lista = UrlShortenerControllerWithLogs.listaSugerencias(customTag, shortURLRepository);
+		ArrayList<Suggestion> lista = MainController.listaSugerencias(customTag, shortURLRepository);
 		return new ResponseEntity<>(lista, HttpStatus.OK);
-	}
-
-	/**
-	 * Redirige a la pagina de estadisticas
-	 * @param id Hash o etiqueta de la URL
-	 * @param request Peticion
-	 * @return Pagina de estadisticas
-	 */
-	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}+", method = RequestMethod.GET)
-	public ResponseEntity<?> redirectToEstadisticas(@PathVariable String id, HttpServletRequest request) {
-		logger.info("Requested redirection with hash " + id);
-		ShortURL l = shortURLRepository.findByHash(id);
-		if (l != null) {
-			return UrlShortenerControllerWithLogs.createSuccessfulRedirectToStatistic(l, clickRepository);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 	}
 
 	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}+/json", method = RequestMethod.GET)
@@ -191,7 +164,7 @@ public class UrlShortenerControllerWithLogs {
 		logger.info("Requested redirection with hash " + id);
 		ShortURL l = shortURLRepository.findByHash(id);
 		if (l != null) {
-			return UrlShortenerControllerWithLogs.createSuccessfulRedirectToStatisticJson(l, clickRepository);
+			return MainController.createSuccessfulRedirectToStatisticJson(l, clickRepository);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -209,12 +182,16 @@ public class UrlShortenerControllerWithLogs {
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "customTag", required = false) String customTag,
-			@RequestParam(value = "disableAd", required = false) Boolean disableAd,
+			@RequestParam(value = "enableAd", required = false) Boolean enableAd,
 			HttpServletRequest request) throws MalformedURLException, URISyntaxException {
 		logger.info("Requested new short for uri " + url);
+		// Get users array
+		Map<String, List<String>> users = HttpServletRequestUtils.getUsers(request);
+		// Get ads enabling
 		Boolean ads;
-		if (disableAd == null || !disableAd) ads = new Boolean(true);
+		if (enableAd != null && enableAd) ads = new Boolean(true);
 		else ads = new Boolean(false);
+		
 		if (customTag != null && !customTag.equals("")) {
 			ShortURL urlConID = shortURLRepository.findByHash(customTag);
 
@@ -223,13 +200,10 @@ public class UrlShortenerControllerWithLogs {
 				String messageError = "La URL a personalizar ya existe";
 				
 				throw new Error400Response(messageError);
-
-				// return new ResponseEntity<>(urlconID,
-				// HttpStatus.BAD_REQUEST);
 			}
 		}
-
-		ShortURL su = UrlShortenerControllerWithLogs.createAndSaveIfValid(url, customTag, ads, shortURLRepository);
+		
+		ShortURL su = MainController.createAndSaveIfValid(url, customTag, ads, users, shortURLRepository);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
@@ -243,8 +217,7 @@ public class UrlShortenerControllerWithLogs {
 	// A donde llega los mensajes de los sockets desde el cliente
 	@MessageMapping("/stadistics")
 	// @SendTo("/sockets/IDPARAMANDAR")
-	public Estadisticas respuestaSocket(HelloMessage infoQueLlega) throws Exception {
-		return new Estadisticas(new Long(1), "", "");
+	public BasicStats respuestaSocket(HelloMessage infoQueLlega) throws Exception {
+		return new BasicStats(new Long(1), "", "");
 	}
-
 }

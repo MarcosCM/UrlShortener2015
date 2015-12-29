@@ -1,9 +1,8 @@
 package urlshortener2015.heatwave.repository;
 
-/**
- * Custom methods
- * @author Marcos Canales Mayo
- */
+import java.util.Map;
+
 public interface ClickRepositoryCustom {
 
+	Map<String, Map<String, Integer>> aggregateInfoByHash(String hash);
 }

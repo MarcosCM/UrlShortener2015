@@ -4,3 +4,4 @@
 /.classpath
 /.project
 /src/main/resources/database.properties
+/src/main/resources/application.properties

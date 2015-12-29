@@ -2,12 +2,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Redirigiendo...</title>
+		<title>Redirecting...</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<!-- If JS is disabled -->
-		<noscript><meta http-equiv="Refresh" content="${countDown};url=${targetURL}" /></noscript>
-		<link rel="stylesheet" type="text/css"
-			href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
 		<script type="text/javascript" src="webjars/jquery/2.1.4/jquery.min.js"></script>
 		<script type="text/javascript" src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 		<script type="text/javascript">
@@ -34,8 +31,8 @@
 			<br/>
 			</c:if>
 			<div class="row">
-				<div class="col-lg-12 text-center">
-					Redirigiendo en <span id="countDown"><strong>${countDown}</strong></span>...
+				<div class="col-lg-12 text-center" style="font-size: 250%">
+					Redirecting in <span id="countDown"><strong>${countDown}</strong></span>...
 				</div>
 			</div>
 		</div>
