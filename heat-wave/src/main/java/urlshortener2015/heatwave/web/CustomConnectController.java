@@ -51,10 +51,40 @@ public class CustomConnectController extends ConnectController {
     	return super.connect(providerId, request);
     }
     
-    @RequestMapping(value = "/{providerId:facebook|twitter}/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET)
-    protected String connect(@PathVariable("providerId") String providerId, @PathVariable("id") String id, NativeWebRequest webRequest, Model model){
-    	logger.info("GET TO /connect/"+providerId+"/"+id);
-    	super.connectionStatus(webRequest, model);
+    @RequestMapping(value = "/{providerId:facebook|twitter}/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET, params="oauth_token")
+    protected String OAuth1Callback(@PathVariable("providerId") String providerId, @PathVariable("id") String id, NativeWebRequest request, Model model){
+    	logger.info("GET TO /connect/"+providerId+"/"+id+" (OAuth1Callback)");
+    	super.oauth1Callback(providerId, request);
+    	//super.connectionStatus(providerId, request, model);
+    	ShortURL url = shortURLRepository.findByHash(id);
+    	model.addAttribute("targetURL", url.getTarget());
+		model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
+		model.addAttribute("advertisement", MainController.DEFAULT_AD_PATH);
+    	if (url.getAds()){
+    		logger.info("t: " + twitter == null ? "null" : "not null");
+    		logger.info("f: " + facebook == null ? "null" : "not null");
+    		switch(providerId){
+	    		case "facebook":
+	    			if (facebook.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, facebook));
+	    			else model.addAttribute("enableAds", true);
+	    			break;
+	    		case "twitter":
+	    			if (twitter.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, twitter));
+	    			else model.addAttribute("enableAds", true);
+	    			break;
+    			default:
+    				break;
+    		}
+    	}
+    	else model.addAttribute("enableAds", false);
+    	return connectedView(providerId, id);
+    }
+    
+    @RequestMapping(value = "/{providerId:facebook|twitter}/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET, params="code")
+    protected String OAuth2Callback(@PathVariable("providerId") String providerId, @PathVariable("id") String id, NativeWebRequest request, Model model){
+    	logger.info("GET TO /connect/"+providerId+"/"+id+" (OAuth2Callback)");
+    	super.oauth2Callback(providerId, request);
+    	//super.connectionStatus(request, model);
     	ShortURL url = shortURLRepository.findByHash(id);
     	model.addAttribute("targetURL", url.getTarget());
 		model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
@@ -75,6 +105,12 @@ public class CustomConnectController extends ConnectController {
     	}
     	else model.addAttribute("enableAds", false);
     	return connectedView(providerId, id);
+    }
+    
+    @RequestMapping(value = "/{providerId:facebook|twitter}/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET, params="error")
+    protected String OAuth2Err(@PathVariable("providerId") String providerId, @PathVariable("id") String id, NativeWebRequest request, Model model){
+    	logger.info("GET TO /connect/"+providerId+"/"+id+" (OAuth2Err)");
+    	return "redirect:/connect/error";
     }
 
     protected String connectedView(String providerId, String url) {
