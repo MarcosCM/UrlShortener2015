@@ -17,15 +17,15 @@ import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 import urlshortener2015.heatwave.entities.ShortURL;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
 
-import io.spring.guides.gs_producing_web_service.TestYourURLS;
-import io.spring.guides.gs_producing_web_service.URLSTested;
+//import io.spring.guides.gs_producing_web_service.TestYourURLS;
+//import io.spring.guides.gs_producing_web_service.URLSTested;
 
 @Endpoint
 public class RedirectionTesterWS {
+/*	
 	
-	/*
 	 * Numero maximo de redirecciones
-	 */
+	 
 	private static final int NUM_MAX_REDIRECCIONES = 5;
 	
 	private static final String TEST_URI = "";
@@ -33,10 +33,10 @@ public class RedirectionTesterWS {
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
 	
-	/**
+	*//**
 	 * Se comprueba periodicamente que las Urls no tienen mas de
 	 * 5 redirecciones.
-	 */
+	 *//*
 	@PayloadRoot(namespace = TEST_URI, localPart = "TestYourURLs")
 	@ResponsePayload
 	public URLSTested testUrls(@RequestPayload TestYourURLS request){
@@ -79,5 +79,5 @@ public class RedirectionTesterWS {
 		}
 		
 		return respuesta;
-	}
+	}*/
 }
