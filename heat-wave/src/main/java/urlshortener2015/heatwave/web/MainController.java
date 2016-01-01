@@ -10,10 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Response;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.common.hash.Hashing;
 
@@ -51,10 +46,10 @@ public class MainController {
 
 	@Autowired
 	private ShortURLRepository shortURLRepository;
-	
+
 	@Autowired
 	private ClickRepository clickRepository;
-	
+
 	// Times
 	public static final int DEFAULT_COUNTDOWN = 10;
 	// Paths
@@ -71,11 +66,14 @@ public class MainController {
 	 * @param browser Source browser
 	 * @param platform Source platform
 	 * @param ip Source IP
+	 * @param country Source country
+	 * @param clickRepository Clicks repository
 	 */
-	public static void createAndSaveClick(String hash, String browser, String platform, String ip, ClickRepository clickRepository) {
-		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()), browser, platform, ip, null);
+	public static void createAndSaveClick(String hash, String browser, String platform, String ip, String country, ClickRepository clickRepository) {
+		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()), browser, platform, ip, country);
 		cl = clickRepository.insert(cl);
-		logger.info(cl != null ? "Click on [" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
+		logger.info(cl != null ? "Click on [" + hash + "] saved with id [" + cl.getId() + "]"
+				: "[" + hash + "] was not saved");
 	}
 
 	/**
@@ -83,11 +81,14 @@ public class MainController {
 	 * @param url URL to shorten
 	 * @param customTag Custom tag
 	 * @param ads Enable/Disable advertisements
+	 * @param users List of users authorized not to see advertisements
+	 * @param shortURLRepository Shortened URLs repository
 	 * @return Shortened URL if success, otherwise error
 	 * @throws URISyntaxException
 	 * @throws MalformedURLException
 	 */
-	public static ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads, Map<String, List<String>> users, ShortURLRepository shortURLRepository) throws MalformedURLException, URISyntaxException {
+	public static ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads, Map<String, List<String>> users, ShortURLRepository shortURLRepository)
+					throws MalformedURLException, URISyntaxException {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
@@ -95,40 +96,24 @@ public class MainController {
 				id = customTag;
 			}
 
-			/*
-			 * Parte Suficiente F3
-			// Se hace un get de la url a acortar para comprobar que la url no es una redireccion a si misma.
-			Client client = ClientBuilder.newClient();
-			Response response = client.target(url).request().get();
-			// Si el codigo es un 3xx y el Location es 'url' --> es redireccion de si misma.
-			if (response.getStatus() / 100 == 3){
-				try {
-					URI entrada = new URI(url);
-					if (entrada.compareTo(response.getLocation()) == 0)
-						throw new Error400Response("La URL a acortar es redireccion de si misma.");
-				} catch (URISyntaxException e) {
-					throw new Error400Response("La URL a acortar no es valida.");
-				}
-			}
-			*/
-			
 			// Si ya existe devolver null
 			ShortURL su = new ShortURL(id, url, new URI(id), new Date(System.currentTimeMillis()),
 					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads, users);
 			return shortURLRepository.insert(su);
-		}
-		else {
+		} else {
 			return null;
 		}
 	}
 
-	public static ResponseEntity<?> createSuccessfulRedirectToStatisticJson(ShortURL url, ClickRepository clickRepository) {
+	public static ResponseEntity<?> createSuccessfulRedirectToStatisticJson(ShortURL url,
+			ClickRepository clickRepository) {
 		// En l tienes todos los datos de la shortURL
-		BasicStats stats = new BasicStats(clickRepository.countByHash(url.getHash()), url.getTarget(), url.getDate().toString());
+		BasicStats stats = new BasicStats(clickRepository.countByHash(url.getHash()), url.getTarget(),
+				url.getDate().toString());
 		return new ResponseEntity<>(stats, HttpStatus.OK);
 	}
-	
-	private static ArrayList<Suggestion> listaSugerencias(String customTag, ShortURLRepository shortURLRepository){
+
+	private static ArrayList<Suggestion> listaSugerencias(String customTag, ShortURLRepository shortURLRepository) {
 		ArrayList<Suggestion> lista = new ArrayList<Suggestion>();
 		if (customTag != null && !customTag.equals("") && shortURLRepository.findByHash(customTag) != null) {
 			String sugerenciaSufijo = SuggestionUtils.sugerenciaSufijos(shortURLRepository, customTag);
@@ -144,7 +129,7 @@ public class MainController {
 		}
 		return lista;
 	}
-	
+
 	/**
 	 * Gets suggestions of a custom URL tag if it already exists
 	 * @param url URL wanted to be shortened
@@ -174,35 +159,38 @@ public class MainController {
 	 * Shortens a specific URL
 	 * @param url URL to shorten
 	 * @param customTag Custom tag of the shortened URL
+	 * @param enableAd Enables/Disables advertisements
 	 * @param request Servlet Request
 	 * @return Success message if the shortened URL was created, error message otherwise
 	 * @throws URISyntaxException
-	 * @throws MalformedURLException 
+	 * @throws MalformedURLException
 	 */
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "customTag", required = false) String customTag,
-			@RequestParam(value = "enableAd", required = false) Boolean enableAd,
-			HttpServletRequest request) throws MalformedURLException, URISyntaxException {
+			@RequestParam(value = "enableAd", required = false) Boolean enableAd, HttpServletRequest request)
+					throws MalformedURLException, URISyntaxException {
 		logger.info("Requested new short for uri " + url);
 		// Get users array
 		Map<String, List<String>> users = HttpServletRequestUtils.getUsers(request);
 		// Get ads enabling
 		Boolean ads;
-		if (enableAd != null && enableAd) ads = new Boolean(true);
-		else ads = new Boolean(false);
-		
+		if (enableAd != null && enableAd)
+			ads = new Boolean(true);
+		else
+			ads = new Boolean(false);
+
 		if (customTag != null && !customTag.equals("")) {
 			ShortURL urlConID = shortURLRepository.findByHash(customTag);
 
 			if (urlConID != null) {
-				//la url personalizada ya existe
+				// la url personalizada ya existe
 				String messageError = "La URL a personalizar ya existe";
-				
+
 				throw new Error400Response(messageError);
 			}
 		}
-		
+
 		ShortURL su = MainController.createAndSaveIfValid(url, customTag, ads, users, shortURLRepository);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
