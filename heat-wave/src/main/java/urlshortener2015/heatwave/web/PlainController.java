@@ -1,8 +1,6 @@
 package urlshortener2015.heatwave.web;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -21,6 +19,7 @@ import urlshortener2015.heatwave.entities.ShortURL;
 import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
+import urlshortener2015.heatwave.utils.ClickUtils;
 import urlshortener2015.heatwave.utils.HttpServletRequestUtils;
 
 @Controller
@@ -79,20 +78,7 @@ public class PlainController {
 		logger.info("Requested redirection with hash " + id);
 		ShortURL url = shortURLRepository.findByHash(id);
 		if (url != null) {
-			//DetailedStats detailedStats = ClickUtils.fromMapToChartParams(url, clickRepository.aggregateInfoByHash(id));
-			// INICIO TESTEO
-			Map<String, Integer> data = new HashMap<String, Integer>();
-			data.put("Firefox", 5);
-			data.put("Chrome", 10);
-			data.put("Opera", 2);
-			Map<String, String> options = new HashMap<String, String>();
-			options.put("title",  "By Browser");
-			String type = "PieChart";
-			DetailedStats.ChartData chartData = new DetailedStats.ChartData(data, options, type);
-			Map<String, DetailedStats.ChartData> charts = new HashMap<String, DetailedStats.ChartData>();
-			charts.put("Browser", chartData);
-			DetailedStats detailedStats = new DetailedStats(url, charts);
-			// FIN TESTEO
+			DetailedStats detailedStats = ClickUtils.fromMapToChartParams(url, clickRepository.aggregateInfoByHash(id));
 			model.addAttribute("detailedStats", detailedStats);
 			return MainController.DEFAULT_STATS_PATH;
 		} else {

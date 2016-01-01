@@ -2,6 +2,9 @@ package urlshortener2015.heatwave.entities;
 
 import java.util.Map;
 
+/**
+ * Google Charts drawer map
+ */
 public class DetailedStats {
 
 	private ShortURL shortURL;
@@ -12,6 +15,9 @@ public class DetailedStats {
 		this.charts = charts;
 	}
 	
+	/**
+	 * Google Charts drawer data map
+	 */
 	public static class ChartData {
 		
 		private Map<String, Integer> data;

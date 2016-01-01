@@ -15,14 +15,29 @@ public class HttpServletRequestUtils {
 	
 	private static final Logger logger = LoggerFactory.getLogger(HttpServletRequestUtils.class);
 	
+	/**
+	 * Gets the source IP address
+	 * @param request Servlet Request
+	 * @return Source IP Address
+	 */
 	public static String getRemoteAddr(HttpServletRequest request){
 		return request != null ? request.getRemoteAddr() : null;
 	}
 	
+	/**
+	 * Gets the source User Agent
+	 * @param request Servlet Request
+	 * @return Source User Agent
+	 */
 	public static String getUserAgent(HttpServletRequest request){
 		return request != null ? request.getHeader("User-Agent") : null;
 	}
 	
+	/**
+	 * Gets the source platform
+	 * @param request Servlet Request
+	 * @return Source platform
+	 */
 	public static String getPlatform(HttpServletRequest request){
 		if (request != null){
 			String userAgent = HttpServletRequestUtils.getUserAgent(request).toLowerCase();
@@ -34,6 +49,11 @@ public class HttpServletRequestUtils {
 		else return null;
 	}
 	
+	/**
+	 * Gets the source browser
+	 * @param request Servlet Request
+	 * @return Source browser
+	 */
 	public static String getBrowser(HttpServletRequest request){
 		if (request != null){
 			String userAgent = HttpServletRequestUtils.getUserAgent(request).toLowerCase();
@@ -49,11 +69,21 @@ public class HttpServletRequestUtils {
 		else return null;
 	}
 	
+	/**
+	 * Gets the source country
+	 * @param request Servlet Request
+	 * @return Source country
+	 */
 	public static String getCountry(HttpServletRequest request){
 		//String ip = HttpServletRequestUtils.getRemoteAddr(request);
 		return null;
 	}
 	
+	/**
+	 * Gets the users list
+	 * @param request Servlet Request
+	 * @return Users list
+	 */
 	public static Map<String, List<String>> getUsers(HttpServletRequest request){
 		Enumeration<String> paramNames = request.getParameterNames();
 		Map<String, List<String>> res = new HashMap<String, List<String>>();

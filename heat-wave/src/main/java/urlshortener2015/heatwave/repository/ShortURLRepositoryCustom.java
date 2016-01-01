@@ -4,5 +4,11 @@ import urlshortener2015.heatwave.entities.ShortURL;
 
 public interface ShortURLRepositoryCustom {
 
-	ShortURL mark(ShortURL urlSafe, boolean safe);
+	/**
+	 * Marks the URL as safe or not safe
+	 * @param url URL to mark
+	 * @param safe Safeness
+	 * @return Marked URL
+	 */
+	ShortURL mark(ShortURL url, boolean safe);
 }

@@ -14,6 +14,12 @@ public class ShortURLUtils {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ShortURLUtils.class);
 	
+	/**
+	 * Checks whether the user is in the Facebook list
+	 * @param shortURL URL whose list the user is going to be checked
+	 * @param facebook Spring Social Facebook object
+	 * @return True if the user is in the list, otherwise false
+	 */
 	public static boolean isUserInList(ShortURL shortURL, Facebook facebook){
 		List<String> list = shortURL.getUsers() == null ? null : shortURL.getUsers().get("facebook");
 		if (list != null){
@@ -25,6 +31,12 @@ public class ShortURLUtils {
 		return false;
 	}
 	
+	/**
+	 * Checks whether the user is in the Twitter list
+	 * @param shortURL URL whose list the user is going to be checked
+	 * @param twitter Spring Social Twitter object
+	 * @return True if the user is in the list, otherwise false
+	 */
 	public static boolean isUserInList(ShortURL shortURL, Twitter twitter){
 		List<String> list = shortURL.getUsers() == null ? null : shortURL.getUsers().get("twitter");
 		if (list != null){

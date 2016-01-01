@@ -13,21 +13,21 @@ public class ClickUtils {
 		FROM:
 		
 		{
-		Clicks : { '0-5' : x, '5-10' : y},
-		Country : { 'Spain' : x, 'France' : y},
-		Browser : { firefox : x, opera : y},
-		Platform : { windows : x, unix : y}
+		clicks : { "0-5" : x, "5-10" : y},
+		country : { "Spain" : x, "France" : y},
+		browser : { "Firefox" : x, "Opera" : y},
+		platform : { "Windows" : x, "Unix" : y}
 		}
 		
 		TO:
 		
 		{
-		Clicks : { data : { '0-5' : x, '5-10' : y},
+		clicks : { data : { '0-5' : x, '5-10' : y},
 			options : { 'title' : 'By Clicks' },
-			type : 'PieChart' },
-		Country : { 'Spain' : x, 'France' : y},
-		Browser : { firefox : x, opera : y},
-		Platform : { windows : x, unix : y}
+			type : 'LineChart' },
+		...
+		...
+		...
 		}
 	 */
 	public static DetailedStats fromMapToChartParams(ShortURL shortURL, Map<String, Map<String, Integer>> mapReducedMap){
@@ -42,10 +42,10 @@ public class ClickUtils {
 			options.put("title", "By " + byName);
 			// Tipo de grafica
 			String type = "";
-			if (byName.equals("Clicks")) type = "PieChart";
-			else if (byName.equals("Country")) type = "BarChart";
-			else if (byName.equals("Browser")) type = "PieChart";
-			else if (byName.equals("Platform")) type = "PieChart";
+			if (byName.equalsIgnoreCase("clicks")) type = "LineChart";
+			else if (byName.equalsIgnoreCase("country")) type = "BarChart";
+			else if (byName.equalsIgnoreCase("browser")) type = "PieChart";
+			else if (byName.equalsIgnoreCase("platform")) type = "PieChart";
 			DetailedStats.ChartData chartData = new DetailedStats.ChartData(data, options, type);
 			// Anadimos a la estructura
 			charts.put(byName, chartData);
