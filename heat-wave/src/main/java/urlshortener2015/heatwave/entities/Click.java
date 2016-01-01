@@ -3,11 +3,13 @@ package urlshortener2015.heatwave.entities;
 import java.math.BigInteger;
 import java.util.Date;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "clicks")
 public class Click {
 
+	@Id
 	private BigInteger id;
 	private String hash;
 	private Date date;

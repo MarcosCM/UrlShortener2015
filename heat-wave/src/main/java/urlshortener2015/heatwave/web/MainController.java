@@ -66,11 +66,11 @@ public class MainController {
 	public static final String DEFAULT_URL_NOT_FOUND_MESSAGE = "That URL does not exist";
 
 	/**
-	 * Guarda un click hecho sobre una URL acortada
-	 * @param hash Identificador de la URL (hash o etiqueta)
-	 * @param browser Navegador desde el que se ha hecho click
-	 * @param platform Sistema Operativo/Plataforma desde la que se ha hecho click
-	 * @param ip IP desde la que se ha hecho click
+	 * Saves a click
+	 * @param hash Shortened URL hash (or custom tag)
+	 * @param browser Source browser
+	 * @param platform Source platform
+	 * @param ip Source IP
 	 */
 	public static void createAndSaveClick(String hash, String browser, String platform, String ip, ClickRepository clickRepository) {
 		Click cl = new Click(null, hash, new Date(System.currentTimeMillis()), browser, platform, ip, null);
@@ -79,11 +79,11 @@ public class MainController {
 	}
 
 	/**
-	 * Crea una URL acortada
-	 * @param url URL a acortar
-	 * @param customTag Etiqueta personalizada
-	 * @param ads Mostrar anuncios
-	 * @return URL acortada en caso de exito, error en caso contrario
+	 * Creates a shortened URL
+	 * @param url URL to shorten
+	 * @param customTag Custom tag
+	 * @param ads Enable/Disable advertisements
+	 * @return Shortened URL if success, otherwise error
 	 * @throws URISyntaxException
 	 * @throws MalformedURLException
 	 */
@@ -146,10 +146,10 @@ public class MainController {
 	}
 	
 	/**
-	 * Devuelve sugerencias para una URL personalizada que ya existe
-	 * @param url URL sobre la que se esta escribiendo una etiqueta
-	 * @param customTag Etiqueta para dicha URL
-	 * @return Lista de sugerencias o vacio si la etiqueta no esta cogida
+	 * Gets suggestions of a custom URL tag if it already exists
+	 * @param url URL wanted to be shortened
+	 * @param customTag Custom tag
+	 * @return List of suggestions if the URL already exists, otherwise empty list
 	 */
 	@RequestMapping(value = "/sugerencias/recomendadas", method = RequestMethod.GET)
 	public ResponseEntity<ArrayList<Suggestion>> sugerencias(@RequestParam(value = "url", required = false) String url,
@@ -171,12 +171,12 @@ public class MainController {
 	}
 
 	/**
-	 * Acorta una URL especificada
-	 * @param url URL a acortar
-	 * @param customTag Etiqueta personalizada solicitada para la URL
-	 * @param request Peticion
-	 * @return Mensaje de exito o error
-	 * @throws URISyntaxException 
+	 * Shortens a specific URL
+	 * @param url URL to shorten
+	 * @param customTag Custom tag of the shortened URL
+	 * @param request Servlet Request
+	 * @return Success message if the shortened URL was created, error message otherwise
+	 * @throws URISyntaxException
 	 * @throws MalformedURLException 
 	 */
 	@RequestMapping(value = "/link", method = RequestMethod.POST)

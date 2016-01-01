@@ -17,25 +17,17 @@ import urlshortener2015.heatwave.repository.ShortURLRepository;
 @Service
 public class RedirectionTesterRequester {
 	
-	/**
-	 * Numero maximo de redirecciones
-	 */
 	private static final int NUM_MAX_REDIRECCIONES = 5;
-	
-	/**
-	 * Periodo de la tarea de actualizar las URLs
-	 */
 	private static final long T = 5*60; //5 minutos
 	
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
 	
 	/**
-	 * Se comprueba periodicamente que las URLs no tienen mas de
-	 * 5 redirecciones.
+	 * Periodically checks all URLs safeness
 	 */
-	//@Async
-	//@Scheduled(fixedRate=T*1000)
+	@Async
+	@Scheduled(fixedRate=T*1000)
 	public void testUrls(){
 		
 		Client client = ClientBuilder.newClient();
