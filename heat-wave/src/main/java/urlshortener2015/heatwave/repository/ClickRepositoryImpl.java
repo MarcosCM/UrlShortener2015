@@ -49,6 +49,7 @@ public class ClickRepositoryImpl implements ClickRepositoryCustom {
 		DBCollection collection = mongoTemplate.getDb().getCollection(ClickRepositoryImpl.collection);
 		MapReduceCommand cmd = new MapReduceCommand(collection, mapFunction, reduceFunction, null, MapReduceCommand.OutputType.INLINE, query);
 		MapReduceOutput output = collection.mapReduce(cmd);
+		logger.info(output.results().toString());
 		// Convert the result
 		Iterator<DBObject> iterator = output.results().iterator();
 		DBObject currentObj, currentValues;

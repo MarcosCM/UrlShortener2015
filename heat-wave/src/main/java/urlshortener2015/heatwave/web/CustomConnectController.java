@@ -19,6 +19,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.view.RedirectView;
 
 import urlshortener2015.heatwave.entities.ShortURL;
+import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
 import urlshortener2015.heatwave.utils.ShortURLUtils;
 
@@ -57,26 +58,31 @@ public class CustomConnectController extends ConnectController {
     	super.oauth1Callback(providerId, request);
     	//super.connectionStatus(providerId, request, model);
     	ShortURL url = shortURLRepository.findByHash(id);
-    	model.addAttribute("targetURL", url.getTarget());
-		model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
-		model.addAttribute("advertisement", MainController.DEFAULT_AD_PATH);
-    	if (url.getAds()){
-    		logger.info("t: " + twitter == null ? "null" : "not null");
-    		logger.info("f: " + facebook == null ? "null" : "not null");
-    		switch(providerId){
-	    		case "facebook":
-	    			if (facebook.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, facebook));
-	    			else model.addAttribute("enableAds", true);
-	    			break;
-	    		case "twitter":
-	    			if (twitter.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, twitter));
-	    			else model.addAttribute("enableAds", true);
-	    			break;
-    			default:
-    				break;
-    		}
+    	if (url != null){
+        	model.addAttribute("targetURL", url.getTarget());
+    		model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
+    		model.addAttribute("advertisement", MainController.DEFAULT_AD_PATH);
+        	if (url.getAds()){
+        		logger.info("t: " + twitter == null ? "null" : "not null");
+        		logger.info("f: " + facebook == null ? "null" : "not null");
+        		switch(providerId){
+    	    		case "facebook":
+    	    			if (facebook.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, facebook));
+    	    			else model.addAttribute("enableAds", true);
+    	    			break;
+    	    		case "twitter":
+    	    			if (twitter.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, twitter));
+    	    			else model.addAttribute("enableAds", true);
+    	    			break;
+        			default:
+        				break;
+        		}
+        	}
+        	else model.addAttribute("enableAds", false);
     	}
-    	else model.addAttribute("enableAds", false);
+    	else{
+    		throw new Error400Response(MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);
+    	}
     	return connectedView(providerId, id);
     }
     

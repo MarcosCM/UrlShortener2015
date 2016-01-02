@@ -26,8 +26,8 @@ public class RedirectionTesterRequester {
 	/**
 	 * Periodically checks all URLs safeness
 	 */
-	@Async
-	@Scheduled(fixedRate=T*1000)
+	//@Async
+	//@Scheduled(fixedRate=T*1000)
 	public void testUrls(){
 		
 		Client client = ClientBuilder.newClient();

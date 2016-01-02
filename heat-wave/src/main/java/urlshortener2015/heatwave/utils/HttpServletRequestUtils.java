@@ -87,7 +87,6 @@ public class HttpServletRequestUtils {
 			int i = 0;
 			while (partes.length > i && !partes[i].contains("\"country\"")) {
 				i++;
-				System.out.println(partes[i]);
 			}
 			partes = partes[i].split(":");
 			country = partes[1].replace("\"", "");
