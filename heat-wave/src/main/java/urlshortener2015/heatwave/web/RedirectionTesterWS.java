@@ -28,7 +28,7 @@ public class RedirectionTesterWS {
 	 */
 	private static final int NUM_MAX_REDIRECCIONES = 5;
 	
-	private static final String TEST_URI = "";
+	private static final String TEST_URI = "http://localhost:8081/TestURLS";
 
 	@Autowired
 	protected ShortURLRepository shortURLRepository;
@@ -37,7 +37,7 @@ public class RedirectionTesterWS {
 	 * Se comprueba periódicamente que las Urls no tienen más de
 	 * 5 redirecciones.
 	 */
-	@PayloadRoot(namespace = TEST_URI, localPart = "TestYourURLs")
+	@PayloadRoot(namespace = TEST_URI, localPart = "TestYourURLS")
 	@ResponsePayload
 	public URLSTested testUrls(@RequestPayload TestYourURLS request){
 		
