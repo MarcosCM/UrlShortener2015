@@ -17,11 +17,11 @@ public class ShortURLRepositoryImpl implements ShortURLRepositoryCustom {
 	private MongoTemplate mongoTemplate;
 	
 	@Override
-	public ShortURL mark(ShortURL su, boolean safe) {
+	public ShortURL mark(ShortURL url, boolean safe) {
 		try {
-			su.setSafe(new Boolean(safe));
-			mongoTemplate.save(su);
-			return su;
+			url.setSafe(new Boolean(safe));
+			mongoTemplate.save(url);
+			return url;
 		} catch (Exception e) {
 			logger.debug("When mark", e);
 			return null;

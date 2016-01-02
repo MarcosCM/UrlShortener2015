@@ -1,9 +1,17 @@
 $(document).ready(function() {
+  // Vars init
+  var authUsersSel = $("#authUsers");
+  var authMethods = {gmail: {buttonId: "gmailAdd", description: 'Gmail', divBg: "bg-danger"},
+                      twitter: {buttonId: "twitterAdd", description: 'Twitter', divBg: "bg-info"},
+                      facebook: {buttonId: "facebookAdd", description: 'Facebook', divBg: "bg-primary"}};
+
+  // Form submit trigger
   $("#shortener").submit(function(event) {
     if (timer != null) {
-      clearTimeout(timer);
+	    clearTimeout(timer);
+	    // Remove inputs to prevent the form to send unneeded data
+	    if (authUsersSel.is(":not(:checked)")) authUsersSel.empty();
     }
-    event.preventDefault();
     $.ajax({
       type : "POST",
       url : "/link",
@@ -19,25 +27,69 @@ $(document).ready(function() {
               document.getElementById("sugerencia").style.display = "none";
       },
       error : function(jqXHR) {
-        console.log(jqXHR);
         var obj = jQuery.parseJSON( jqXHR.responseText );
         var mensaje=obj.message;
-	if(mensaje.localeCompare("La URL a personalizar ya existe")==0 ){
-		$("#result").html( "<div class='alert alert-danger lead'>La URL a personalizar ya existe</div>");
-         	document.getElementById("sugerencias").style.display = "inline";
-         	document.getElementById("sugerencia").style.display = "inline";
-		mostrarSugerencias();
-
-	}
+		if(mensaje.localeCompare("La URL a personalizar ya existe")==0 || mensaje.localeCompare("La URL a acortar no es válida")==0){
+			$("#result").html( "<div class='alert alert-danger lead'>"+mensaje+"</div>");
+	        document.getElementById("sugerencias").style.display = "inline";
+	        document.getElementById("sugerencia").style.display = "inline";
+			mostrarSugerencias();
+		}
         else{
-          $("#result").html( "<div class='alert alert-danger lead'>Error de conexión</div>");
-          document.getElementById("sugerencias").style.display = "none";
-          document.getElementById("sugerencia").style.display = "none";
+	        $("#result").html( "<div class='alert alert-danger lead'>Error de conexión</div>");
+	        document.getElementById("sugerencias").style.display = "none";
+	        document.getElementById("sugerencia").style.display = "none";
         }
       }
     });
+    event.preventDefault();
+  });
+  
+  // Enable Ad button change trigger
+  $("#enableAd").change(function(){
+    var elSel = $(this);
+    if (elSel.is(":checked")){
+      // Check whether the div hasn't been previously filled
+      if (authUsersSel.is(":empty")){
+        // Set HTML content
+        var headerContent = "<br><div id='authUsersHelp' class='col-sm-12'>Please, fill with <strong>usernames</strong> of people you don't want to view ads</div><div id='authUsersHeader' class='input-group col-sm-12'>";
+        var tableContent = "";
+        for(var key in authMethods){
+          headerContent += "<div class='col-sm-4 " + authMethods[key]['divBg'] + "'><label for='" + authMethods[key]['buttonId'] + "'>" + authMethods[key]['description'] + "</label><button type='button' id='" + authMethods[key]['buttonId'] + "' class='btn btn-default pull-right'><span class='glyphicon glyphicon-plus'></span></button></div>"
+          tableContent += "<div class='col-sm-4 " + authMethods[key]['divBg'] + "' id='" + key + "Container'></div>";
+        }
+        headerContent += "</div><br>";
+        authUsersSel.html(headerContent + tableContent);
+        // Set triggers
+        setAuthButtonsTriggers(authMethods);
+      } else {
+        authUsersSel.show();
+      }
+    }
+    else{
+      authUsersSel.hide();
+    }
+  });
+
+  // Login buttons triggers
+  $("[id$=Login]").each(function(){
+    $(this).submit(function(event){
+      $(this).attr('action', $(this).attr('action') + "/" + $("#goToUrl").val());
+      // Submit
+    });
   });
 });
+
+function setAuthButtonsTriggers(authMethods){
+  for(var key in authMethods){
+    (function(k){
+      var htmlContent = "<div class='col-sm-12'><input type='text' name='users[\"" + k + "\"][]' class='" + authMethods[k]['divBg'] + "'></div>";
+      $("#" + authMethods[k]['buttonId']).click(function(){
+        $("#" + k + "Container").prepend(htmlContent);
+      });
+    })(key);
+  }
+}
 
 function personalizar(){
   if(document.getElementById("checkPersonalizar").checked){
@@ -49,7 +101,6 @@ function personalizar(){
   }
 }
 
-//onchange="setTimeout(comprobarTiempo, 1500)
 function elegirSugerencia (id) {
   document.getElementById("urlPerson").value=id;
 }
