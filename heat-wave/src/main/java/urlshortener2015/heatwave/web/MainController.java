@@ -195,11 +195,12 @@ public class MainController {
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
-
+			
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 		} else {
 			throw new Error400Response("La URL a acortar no es válida");
 		}
+		
 	}
 
 	// A donde llega los mensajes de los sockets desde el cliente
