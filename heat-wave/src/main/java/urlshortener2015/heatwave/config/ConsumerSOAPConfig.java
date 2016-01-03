@@ -12,7 +12,7 @@ public class ConsumerSOAPConfig {
 	@Bean
 	public Jaxb2Marshaller marshaller() {
 		Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-		marshaller.setContextPath("localhost._8081.soap");
+		marshaller.setContextPath("urlshortener2015.heatwave.soap");
 		return marshaller;
 	}
 

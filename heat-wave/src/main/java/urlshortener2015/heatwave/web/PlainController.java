@@ -88,7 +88,6 @@ public class PlainController {
 		ShortURL url = shortURLRepository.findByHash(id);
 		if (url != null) {
 			DetailedStats detailedStats = ClickUtils.fromMapToChartParams(url, clickRepository.aggregateInfoByHash(id));
-			logger.info(detailedStats.toString());
 			model.addAttribute("detailedStats", detailedStats);
 			return MainController.DEFAULT_STATS_PATH;
 		} else {
