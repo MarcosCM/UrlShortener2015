@@ -65,10 +65,10 @@ public class PlainController {
 					HttpServletRequestUtils.getCountry(request), clickRepository);
 			DetailedStats stats = graficoStats(id, null, null);
 			this.template.convertAndSend("/sockets/" + id, stats);
-			model.addAttribute("targetURL", url.getTarget());
-			model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
-			model.addAttribute("advertisement", MainController.DEFAULT_AD_PATH);
-			model.addAttribute("enableAds", url.getAds());
+			if (!model.containsAttribute("targetURL")) model.addAttribute("targetURL", url.getTarget());
+			if (!model.containsAttribute("countDown")) model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
+			if (!model.containsAttribute("advertisement")) model.addAttribute("advertisement", MainController.DEFAULT_AD_PATH);
+			if (!model.containsAttribute("enableAds")) model.addAttribute("enableAds", url.getAds());
 			return MainController.DEFAULT_REDIRECTING_PATH;
 		} else {
 			throw new Error400Response(MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);

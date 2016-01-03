@@ -1,9 +1,9 @@
 $(document).ready(function() {
   // Vars init
   var authUsersSel = $("#authUsers");
-  var authMethods = {gmail: {buttonId: "gmailAdd", description: 'Gmail', divBg: "bg-danger"},
-                      twitter: {buttonId: "twitterAdd", description: 'Twitter', divBg: "bg-info"},
-                      facebook: {buttonId: "facebookAdd", description: 'Facebook', divBg: "bg-primary"}};
+  var authMethods = {gmail: {buttonId: "gmailAdd", description: "Gmail", divBg: "bg-danger"},
+                      twitter: {buttonId: "twitterAdd", description: "Twitter", divBg: "bg-info"},
+                      facebook: {buttonId: "facebookAdd", description: "Facebook", divBg: "bg-primary"}};
 
   // Form submit trigger
   $("#shortener").submit(function(event) {

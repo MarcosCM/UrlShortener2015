@@ -87,7 +87,6 @@ public class HttpServletRequestUtils {
 			int i = 0;
 			while (partes.length > i && !partes[i].contains("\"country\"")) {
 				i++;
-				System.out.println(partes[i]);
 			}
 			partes = partes[i].split(":");
 			country = partes[1].replace("\"", "");
@@ -107,10 +106,9 @@ public class HttpServletRequestUtils {
 		String paramName, currentParam;
 		while (paramNames.hasMoreElements()) {
 			paramName = paramNames.nextElement();
-			logger.info("Checking param: " + paramName);
-			// users["gmail"][]
+			// users["twitter"][]
 			if (paramName.startsWith("users[")) {
-				// gmail
+				// twitter
 				currentParam = paramName.substring(paramName.indexOf("[") + 2, paramName.indexOf("]") - 1);
 				res.put(currentParam, Arrays.asList(request.getParameterValues(paramName)));
 			}

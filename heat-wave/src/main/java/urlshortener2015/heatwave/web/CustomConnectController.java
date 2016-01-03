@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import urlshortener2015.heatwave.entities.ShortURL;
+import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
 import urlshortener2015.heatwave.utils.ShortURLUtils;
 
@@ -52,58 +54,63 @@ public class CustomConnectController extends ConnectController {
     }
     
     @RequestMapping(value = "/{providerId:facebook|twitter}/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET, params="oauth_token")
-    protected String OAuth1Callback(@PathVariable("providerId") String providerId, @PathVariable("id") String id, NativeWebRequest request, Model model){
+    protected String OAuth1Callback(@PathVariable("providerId") String providerId, @PathVariable("id") String id, NativeWebRequest request, Model model,
+    		RedirectAttributes redirectAttributes){
+    	// Using redirectAttributes to keep the model attributes in the redirect target model
     	logger.info("GET TO /connect/"+providerId+"/"+id+" (OAuth1Callback)");
     	super.oauth1Callback(providerId, request);
-    	//super.connectionStatus(providerId, request, model);
     	ShortURL url = shortURLRepository.findByHash(id);
-    	model.addAttribute("targetURL", url.getTarget());
-		model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
-		model.addAttribute("advertisement", MainController.DEFAULT_AD_PATH);
-    	if (url.getAds()){
-    		logger.info("t: " + twitter == null ? "null" : "not null");
-    		logger.info("f: " + facebook == null ? "null" : "not null");
-    		switch(providerId){
-	    		case "facebook":
-	    			if (facebook.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, facebook));
-	    			else model.addAttribute("enableAds", true);
-	    			break;
-	    		case "twitter":
-	    			if (twitter.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, twitter));
-	    			else model.addAttribute("enableAds", true);
-	    			break;
-    			default:
-    				break;
-    		}
+    	if (url != null){
+    		redirectAttributes.addFlashAttribute("targetURL", url.getTarget());
+    		redirectAttributes.addFlashAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
+    		redirectAttributes.addFlashAttribute("advertisement", MainController.DEFAULT_AD_PATH);
+        	if (url.getAds()){
+        		if (providerId.equals("facebook")){
+	    			if (facebook.isAuthorized()) redirectAttributes.addFlashAttribute("enableAds", !ShortURLUtils.isUserInList(url, facebook));
+	    			else redirectAttributes.addFlashAttribute("enableAds", true);
+        		}
+        		else if(providerId.equals("twitter")){
+        			if (twitter.isAuthorized()) redirectAttributes.addFlashAttribute("enableAds", !ShortURLUtils.isUserInList(url, twitter));
+	    			else redirectAttributes.addFlashAttribute("enableAds", true);
+        		}
+        		else{
+        			//could not resolve the providerId
+        			redirectAttributes.addFlashAttribute("enableAds", true);
+        		}
+        	}
+        	else redirectAttributes.addFlashAttribute("enableAds", false);
     	}
-    	else model.addAttribute("enableAds", false);
+    	else{
+    		throw new Error400Response(MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);
+    	}
     	return connectedView(providerId, id);
     }
     
     @RequestMapping(value = "/{providerId:facebook|twitter}/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET, params="code")
-    protected String OAuth2Callback(@PathVariable("providerId") String providerId, @PathVariable("id") String id, NativeWebRequest request, Model model){
+    protected String OAuth2Callback(@PathVariable("providerId") String providerId, @PathVariable("id") String id, NativeWebRequest request, Model model,
+    		RedirectAttributes redirectAttributes){
     	logger.info("GET TO /connect/"+providerId+"/"+id+" (OAuth2Callback)");
     	super.oauth2Callback(providerId, request);
     	//super.connectionStatus(request, model);
     	ShortURL url = shortURLRepository.findByHash(id);
-    	model.addAttribute("targetURL", url.getTarget());
-		model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
-		model.addAttribute("advertisement", MainController.DEFAULT_AD_PATH);
+    	redirectAttributes.addFlashAttribute("targetURL", url.getTarget());
+    	redirectAttributes.addFlashAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
+    	redirectAttributes.addFlashAttribute("advertisement", MainController.DEFAULT_AD_PATH);
     	if (url.getAds()){
     		switch(providerId){
 	    		case "facebook":
-	    			if (facebook.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, facebook));
-	    			else model.addAttribute("enableAds", true);
+	    			if (facebook.isAuthorized()) redirectAttributes.addFlashAttribute("enableAds", !ShortURLUtils.isUserInList(url, facebook));
+	    			else redirectAttributes.addFlashAttribute("enableAds", true);
 	    			break;
 	    		case "twitter":
-	    			if (twitter.isAuthorized()) model.addAttribute("enableAds", !ShortURLUtils.isUserInList(url, twitter));
-	    			else model.addAttribute("enableAds", true);
+	    			if (twitter.isAuthorized()) redirectAttributes.addFlashAttribute("enableAds", !ShortURLUtils.isUserInList(url, twitter));
+	    			else redirectAttributes.addFlashAttribute("enableAds", true);
 	    			break;
     			default:
     				break;
     		}
     	}
-    	else model.addAttribute("enableAds", false);
+    	else redirectAttributes.addFlashAttribute("enableAds", false);
     	return connectedView(providerId, id);
     }
     

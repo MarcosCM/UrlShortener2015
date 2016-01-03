@@ -42,7 +42,7 @@ public class ClickUtils {
 			options.put("title", "By " + byName);
 			// Tipo de grafica
 			String type = "";
-			if (byName.equalsIgnoreCase("clicks")) type = "LineChart";
+			if (byName.equalsIgnoreCase("date")) type = "LineChart";
 			else if (byName.equalsIgnoreCase("country")) type = "BarChart";
 			else if (byName.equalsIgnoreCase("browser")) type = "PieChart";
 			else if (byName.equalsIgnoreCase("platform")) type = "PieChart";

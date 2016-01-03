@@ -4,15 +4,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
@@ -21,8 +15,8 @@ import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 import urlshortener2015.heatwave.entities.ShortURL;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
 
-import localhost._8081.soap.TestYourURLS;
-import localhost._8081.soap.URLSTested;
+import urlshortener2015.heatwave.soap.TestYourURLS;
+import urlshortener2015.heatwave.soap.URLSTested;
 
 @Endpoint
 public class RedirectionTesterWS {

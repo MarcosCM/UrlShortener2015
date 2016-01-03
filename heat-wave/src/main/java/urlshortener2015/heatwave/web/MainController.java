@@ -139,7 +139,6 @@ public class MainController {
 	@RequestMapping(value = "/sugerencias/recomendadas", method = RequestMethod.GET)
 	public ResponseEntity<ArrayList<Suggestion>> sugerencias(@RequestParam(value = "url", required = false) String url,
 			@RequestParam(value = "customTag", required = false) String customTag) {
-		logger.info("Getting suggestions for the custom tag: " + customTag);
 		ArrayList<Suggestion> lista = MainController.listaSugerencias(customTag, shortURLRepository);
 		return new ResponseEntity<>(lista, HttpStatus.OK);
 	}
