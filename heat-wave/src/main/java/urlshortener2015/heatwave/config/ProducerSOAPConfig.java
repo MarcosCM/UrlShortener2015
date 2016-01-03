@@ -12,9 +12,10 @@ import org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition;
 import org.springframework.xml.xsd.SimpleXsdSchema;
 import org.springframework.xml.xsd.XsdSchema;
 
+
 @EnableWs
 @Configuration
-public class SOAPConfig extends WsConfigurerAdapter {
+public class ProducerSOAPConfig extends WsConfigurerAdapter {
 	@Bean
 	public ServletRegistrationBean messageDispatcherServlet(ApplicationContext applicationContext) {
 		MessageDispatcherServlet servlet = new MessageDispatcherServlet();
@@ -37,4 +38,5 @@ public class SOAPConfig extends WsConfigurerAdapter {
 	public XsdSchema URLTesterSchema() {
 		return new SimpleXsdSchema(new ClassPathResource("urlTesters.xsd"));
 	}
+	
 }

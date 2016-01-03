@@ -56,7 +56,7 @@ public class RedirectionTesterWS {
 		
 		for(ShortURL url : URLS){
 			String urlTarget = url.getTarget();
-			for(int i=0; i<5; i++){
+			for(int i=0; i<NUM_MAX_REDIRECCIONES; i++){
 				try{
 					URL urlToConnect = new URL(urlTarget);
 					
@@ -74,7 +74,7 @@ public class RedirectionTesterWS {
 						// Si el codigo es un 3xx
 						logger.info("redirection 300: " + urlTarget);
 						//Alcanzado el limite de redirecciones.
-						if(i == 4){
+						if(i == NUM_MAX_REDIRECCIONES-1){
 							shortURLRepository.mark(url, false);
 							logger.info(url.getTarget() + " -> incorrecta");
 							conn.disconnect();
