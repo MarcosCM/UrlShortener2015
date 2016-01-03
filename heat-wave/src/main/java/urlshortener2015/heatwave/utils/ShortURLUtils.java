@@ -1,6 +1,7 @@
 package urlshortener2015.heatwave.utils;
 
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -40,11 +41,15 @@ public class ShortURLUtils {
 	public static boolean isUserInList(ShortURL shortURL, Twitter twitter){
 		List<String> list = shortURL.getUsers() == null ? null : shortURL.getUsers().get("twitter");
 		if (list != null){
-			logger.info("Twitter profile URL: " + twitter.userOperations().getUserProfile().getProfileUrl());
-			Pattern p = Pattern.compile("(?:http|https)://(?:www?).twitter.com/(.*)");
-			String userMail = p.matcher(twitter.userOperations().getUserProfile().getProfileUrl()).group(1);
-			for(String s : list){
-				if (s.equals(userMail)) return true;
+			Pattern p = Pattern.compile("http://twitter\\.com/(.*)");
+			Matcher m = p.matcher(twitter.userOperations().getUserProfile().getProfileUrl());
+			if (m.find()){
+				String userName = m.group(1);
+				for(String s : list){
+					if (s.equalsIgnoreCase(userName)){
+						return true;
+					}
+				}
 			}
 		}
 		return false;
