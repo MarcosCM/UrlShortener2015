@@ -21,6 +21,11 @@
 		google.setOnLoadCallback(drawChart);
 
 		function drawChart(){
+			<%--
+			The code gets bigger and bigger when the number of charts to be displayed gets increased
+			ToDo Improvement: turn the JSTL loop into a JavaScript loop, so the code sent to the client
+			is always the same (its size does not change) and does not get bigger
+			--%>
 			<c:forEach items="${detailedStats.getCharts()}" var="outerEntry" varStatus="outerLoop">
 			var data_${outerEntry.key} = new google.visualization.DataTable();
 			data_${outerEntry.key}.addColumn('string', 'Name');
