@@ -45,20 +45,19 @@ public class PlainController {
 
 	@Autowired
 	private SimpMessagingTemplate template;
-
+	
 	/**
-	 * Redireccion de una URL acortada
-	 * @param id Hash o etiqueta de la URL
-	 * @param request Peticion
-	 * @param model Modelo con atributos
-	 * @return Pagina de redireccion
-	 * @throws IOException Si el archivo que contiene la imagen de publicidad no existe o no es una imagen
+	 * Redirect to a shortened URL
+	 * @param id Hash or custom tag
+	 * @param request Request
+	 * @param model Model
+	 * @return Redirect page
+	 * @throws IOException
 	 */
-	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id:(?!link|!stadistics|!error|index).*}", method = RequestMethod.GET)
 	public String redirectTo(@PathVariable String id, HttpServletRequest request, Model model) throws IOException {
 		logger.info("Requested redirection to statistics with hash " + id);
 		ShortURL url = shortURLRepository.findByHash(id);
-
 		if (url != null) {
 			MainController.createAndSaveClick(id, HttpServletRequestUtils.getBrowser(request),
 					HttpServletRequestUtils.getPlatform(request), HttpServletRequestUtils.getRemoteAddr(request),
@@ -76,13 +75,13 @@ public class PlainController {
 	}
 
 	/**
-	 * Redirige a la pagina de estadisticas
-	 * @param id Hash o etiqueta de la URL
-	 * @param request Peticion
-	 * @param model Modelo con atributos
-	 * @return Pagina de estadisticas
+	 * Redirects to the stats page
+	 * @param id Hash or custom tag
+	 * @param request Request
+	 * @param model Model
+	 * @return Stats page
 	 */
-	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}+", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id:(?!link|!stadistics|!error||index).*}+", method = RequestMethod.GET)
 	public String redirectToEstadisticas(@PathVariable String id, HttpServletRequest request, Model model) {
 		logger.info("Requested redirection with hash " + id);
 		ShortURL url = shortURLRepository.findByHash(id);
@@ -106,10 +105,10 @@ public class PlainController {
 	}
 
 	/*
-	 * Devuelve un mapa de País-num clics, dada (opcional) dos fechas para filtrar
+	 * Devuelve un mapa de Pais-num clicks, dada (opcional) dos fechas para filtrar
 	 */
 	public Map<String, Integer> getCountries(List<Click> clicks, String desde, String hasta) {
-		// mirar primreo si es null
+		// mirar primero si es null
 		Date ddesde = null;
 		Date dhasta = null;
 		if (hasta != null)

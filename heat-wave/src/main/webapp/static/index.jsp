@@ -1,3 +1,4 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,6 +16,14 @@
 				<h1>URL Shortener</h1>
 				<p class="lead">Feel free to shorten your URL!</p>
 				<br>
+				<c:if test="${(authThrough != null) && (authAs != null)}">
+					<c:choose>
+						<c:when test="${authThrough == 'twitter'}"><div class="center-block">Logged through <span class="bg-info">Twitter</span> as ${authAs}</div></c:when>
+						<c:when test="${authThrough == 'facebook'}"><div class="center-block">Logged through <span class="bg-primary">Facebook</span> as ${authAs}</div></c:when>
+						<c:when test="${authThrough == 'google'}"><div class="center-block">Logged through <span class="bg-danger">Google</span> as ${authAs}</div></c:when>
+						<c:otherwise></c:otherwise>
+					</c:choose>
+				</c:if>
 				<form class="col-lg-12" role="form" id="shortener" action="">
 					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
 						<input type="text" class="center-block form-control input-lg" title="Enter a URL" placeholder="Enter a URL" id="url" name="url">
@@ -88,7 +97,7 @@
 	        	<br>
 	        	<p class="lead text-center">Code of the URL to go to (or custom tag)</p>
 	        	<div class="text-center">
-	        		<input type="text" id="goToUrl" name="goToUrl" placeholder="Example: 4l0dcef">
+	        		<input type="text" id="goToURL" name="goToURL" placeholder="Example: 4l0dcef">
 	        	</div>
 	        </div>
     	</div>

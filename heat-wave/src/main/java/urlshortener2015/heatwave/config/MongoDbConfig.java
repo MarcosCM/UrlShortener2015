@@ -20,8 +20,6 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
 @Configuration
-@EnableAsync
-@EnableScheduling
 @EnableMongoRepositories(basePackageClasses=urlshortener2015.heatwave.repository.ClickRepository.class)
 @PropertySource(value = { "classpath:database.properties" })
 public class MongoDbConfig {
