@@ -24,7 +24,7 @@ import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.web.GenericConnectionStatusView;
 import org.springframework.social.google.api.Google;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
- 
+
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for Spring Social connectivity with Google.
  *
@@ -37,16 +37,16 @@ import org.springframework.social.google.connect.GoogleConnectionFactory;
 @AutoConfigureBefore(SocialWebAutoConfiguration.class)
 @AutoConfigureAfter(WebMvcAutoConfiguration.class)
 public class GoogleAutoConfiguration {
- 
+
     @Configuration
     @EnableSocial
     @EnableConfigurationProperties(GoogleProperties.class)
     @ConditionalOnWebApplication
     protected static class GoogleConfigurerAdapter extends SocialConfigurerAdapter {
- 
+
         @Autowired
         private GoogleProperties properties;
- 
+
         @Bean
         @ConditionalOnMissingBean
         @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
@@ -54,13 +54,13 @@ public class GoogleAutoConfiguration {
             Connection<Google> connection = repository.findPrimaryConnection(Google.class);
             return connection != null ? connection.getApi() : null;
         }
- 
+
         @Bean(name = { "connect/googleConnect", "connect/googleConnected" })
         @ConditionalOnProperty(prefix = "spring.social", name = "auto-connection-views")
         public GenericConnectionStatusView googleConnectView() {
             return new GenericConnectionStatusView("google", "Google");
         }
- 
+
         @Override
         public void addConnectionFactories(ConnectionFactoryConfigurer configurer, Environment environment) {
             GoogleConnectionFactory factory = new GoogleConnectionFactory(this.properties.getAppId(), this.properties.getAppSecret());
@@ -68,4 +68,5 @@ public class GoogleAutoConfiguration {
             configurer.addConnectionFactory(factory);
         }
     }
+
 }

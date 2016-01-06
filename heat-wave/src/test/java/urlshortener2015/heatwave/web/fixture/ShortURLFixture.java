@@ -1,9 +1,5 @@
 package urlshortener2015.heatwave.web.fixture;
 
-import urlshortener2015.heatwave.web.*;
-
-import java.net.URI;
-import java.util.Date;
 import java.util.List;
 import java.util.HashMap;
 

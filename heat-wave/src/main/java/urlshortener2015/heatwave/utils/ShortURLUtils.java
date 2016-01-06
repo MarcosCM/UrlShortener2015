@@ -1,11 +1,7 @@
 package urlshortener2015.heatwave.utils;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.social.ApiBinding;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.google.api.Google;
@@ -14,8 +10,6 @@ import org.springframework.social.twitter.api.Twitter;
 import urlshortener2015.heatwave.entities.ShortURL;
 
 public class ShortURLUtils {
-	
-	private static final Logger logger = LoggerFactory.getLogger(ShortURLUtils.class);
 	
 	/**
 	 * Checks whether the user is in the list linked to the ApiBinding

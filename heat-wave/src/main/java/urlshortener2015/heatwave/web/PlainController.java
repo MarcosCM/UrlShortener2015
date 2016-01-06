@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +30,7 @@ import urlshortener2015.heatwave.entities.ShortURL;
 import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
+import urlshortener2015.heatwave.utils.ApiBindingUtils;
 import urlshortener2015.heatwave.utils.ClickUtils;
 import urlshortener2015.heatwave.utils.HttpServletRequestUtils;
 
@@ -45,6 +47,22 @@ public class PlainController {
 
 	@Autowired
 	private SimpMessagingTemplate template;
+	
+	@Autowired
+	private ConnectionRepository connectionRepository;
+	
+	/**
+	 * Redirects to the home page
+	 * @param request Request
+	 * @param model Model
+	 * @return Home page
+	 */
+	@RequestMapping(value = "/")
+	public String homePage(HttpServletRequest request, Model model){
+		model.addAttribute("authThrough", ApiBindingUtils.getAuthThrough(connectionRepository));
+		model.addAttribute("authAs", ApiBindingUtils.getAuthAs(connectionRepository));
+		return MainController.DEFAULT_HOME_PATH;
+	}
 	
 	/**
 	 * Redirect to a shortened URL

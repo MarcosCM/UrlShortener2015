@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beansProjectDescription>
+	<version>1</version>
+	<pluginVersion><![CDATA[3.7.2.201511260958-RELEASE]]></pluginVersion>
+	<configSuffixes>
+		<configSuffix><![CDATA[xml]]></configSuffix>
+	</configSuffixes>
+	<enableImports><![CDATA[false]]></enableImports>
+	<configs>
+		<config>java:urlshortener2015.heatwave.config.ConsumerSOAPConfig</config>
+		<config>java:urlshortener2015.heatwave.config.GoogleAutoConfiguration$GoogleConfigurerAdapter</config>
+		<config>java:urlshortener2015.heatwave.config.MongoDbConfig</config>
+		<config>java:urlshortener2015.heatwave.config.ProducerSOAPConfig</config>
+		<config>java:urlshortener2015.heatwave.config.WebSocketConfig</config>
+	</configs>
+	<autoconfigs>
+		<config>java:urlshortener2015.heatwave.Application</config>
+	</autoconfigs>
+	<configSets>
+	</configSets>
+</beansProjectDescription>

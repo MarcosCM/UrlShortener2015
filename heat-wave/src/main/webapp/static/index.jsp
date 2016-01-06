@@ -24,41 +24,80 @@
 						<c:otherwise></c:otherwise>
 					</c:choose>
 				</c:if>
-				<form class="col-lg-12" role="form" id="shortener" action="">
-					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-						<input type="text" class="center-block form-control input-lg" title="Enter a URL" placeholder="Enter a URL" id="url" name="url">
-						<span class="input-group-btn"><button class="btn btn-lg btn-primary" type="submit">Short me!</button></span>
+				<div class="col-sm-offset-4 col-lg-2 col-md-2 col-sm-12 col-xs-12">
+					<div class="col-lg-12">
+						<p class="lead">Register form</p>
+						<form role="form" id="register" action="/user/register" method="POST">
+							<div class="input-group input-group-lg col-sm-12">
+								<input type="text" class="center-block form-control input-lg" title="Enter a username" placeholder="Enter a username" id="username" name="username">
+							</div>
+							<br>
+							<div class="input-group input-group-lg col-sm-12">
+								<input type="password" class="center-block form-control input-lg" title="Enter a password" placeholder="Enter a password" id="password" name="password">
+							</div>
+							<br>
+							<div class="input-group input-group-lg col-sm-12">
+								<input type="submit" class="btn" value="Register!">
+							</div>
+						</form>
 					</div>
-					<br>
-					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-						<div class="input-group">
-					 		<span class="input-group-addon">
-					 			<input type="checkbox" aria-label="..." name="enableAd" id="enableAd">
-					 		</span>
-					 		<input readonly type="text" class="form-control" value="The shortened URL will show an advertisement">
-					 	</div>
-				  	</div>
-				  	<div id="authUsers" class="input-group input-group-lg col-sm-offset-4 col-sm-4"></div>
-					<br>
-					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-						<div class="input-group">
-							<span class="input-group-addon">
-								<input id="checkPersonalizar" onclick="personalizar()" type="checkbox" aria-label="...">
-							</span>
-							<input readonly type="text" class="form-control" value="I want a custom URL tag">
-						</div>
+				</div>
+				<div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+					<div class="col-lg-12">
+						<p class="lead">Login form</p>
+						<form role="form" id="login" action="/user/login" method="POST">
+							<div class="input-group input-group-lg col-sm-12">
+								<input type="text" class="center-block form-control input-lg" title="Enter a username" placeholder="Enter a username" id="username" name="username">
+							</div>
+							<br>
+							<div class="input-group input-group-lg col-sm-12">
+								<input type="password" class="center-block form-control input-lg" title="Enter a password" placeholder="Enter a password" id="password" name="password">
+							</div>
+							<br>
+							<div class="input-group input-group-lg col-sm-12">
+								<input type="submit" class="btn" value="Login!">
+							</div>
+						</form>
 					</div>
-					<br>
-					<div id="divPersonalizar" style="visibility: hidden;" class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-						<div class="input-group">
-							<span id="divPersonalizar" class="input-group-addon" id="basic-addon3">http://shorturl.es/</span>
-							<input type="text" name="customTag" class="form-control" id="urlPerson" onkeyup="comprobarSugerencias(this)" aria-describedby="basic-addon3">
+				</div>
+				<div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12"><hr></div>
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<form class="col-lg-12" role="form" id="shortener" action="">
+						<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+							<input type="text" class="center-block form-control input-lg" title="Enter a URL" placeholder="Enter a URL" id="url" name="url">
+							<span class="input-group-btn"><button class="btn btn-lg btn-primary" type="submit">Short me!</button></span>
 						</div>
 						<br>
-						<div id="sugerencia"></div>
-						<div id="sugerencias" class="btn-group" role="group" /></div>
-					</div>
-				</form>
+						<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+							<div class="input-group">
+						 		<span class="input-group-addon">
+						 			<input type="checkbox" aria-label="..." name="enableAd" id="enableAd">
+						 		</span>
+						 		<input readonly type="text" class="form-control" value="The shortened URL will show an advertisement">
+						 	</div>
+					  	</div>
+					  	<div id="authUsers" class="input-group input-group-lg col-sm-offset-4 col-sm-4"></div>
+						<br>
+						<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+							<div class="input-group">
+								<span class="input-group-addon">
+									<input id="checkPersonalizar" onclick="personalizar()" type="checkbox" aria-label="...">
+								</span>
+								<input readonly type="text" class="form-control" value="I want a custom URL tag">
+							</div>
+						</div>
+						<br>
+						<div id="divPersonalizar" style="visibility: hidden;" class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+							<div class="input-group">
+								<span id="divPersonalizar" class="input-group-addon" id="basic-addon3">http://shorturl.es/</span>
+								<input type="text" name="customTag" class="form-control" id="urlPerson" onkeyup="comprobarSugerencias(this)" aria-describedby="basic-addon3">
+							</div>
+							<br>
+							<div id="sugerencia"></div>
+							<div id="sugerencias" class="btn-group" role="group" /></div>
+						</div>
+					</form>
+				</div>
 			</div>
 		</div>
 		<div class="row">
@@ -92,13 +131,6 @@
 		        		<button type="submit" id="facebookLoginRedirect" class="btn btn-lg btn-primary btn-block">Facebook</button>
 		        	</form>
 		        </div>
-	        </div>
-	        <div class="col-sm-offset-4 col-xs-12 col-sm-4 col-md-4 col-lg-4">
-	        	<br>
-	        	<p class="lead text-center">Code of the URL to go to (or custom tag)</p>
-	        	<div class="text-center">
-	        		<input type="text" id="goToURL" name="goToURL" placeholder="Example: 4l0dcef">
-	        	</div>
 	        </div>
     	</div>
 	</div>

@@ -51,6 +51,7 @@ dependencies {
 
 	// Spring Security
 	compile("org.springframework.security:spring-security-web:4.0.3.RELEASE")
+	compile("org.springframework.security:spring-security-config:4.0.3.RELEASE")
 
 	// Spring Social
     compile("org.springframework.social:spring-social-facebook:2.0.3.RELEASE")
@@ -59,6 +60,9 @@ dependencies {
     compile("org.springframework.social:spring-social-web:1.1.4.RELEASE")
     compile("org.springframework.social:spring-social-config:1.1.4.RELEASE")
     compile("org.springframework.social:spring-social-security:1.1.4.RELEASE")
+
+	// JWT
+    compile("io.jsonwebtoken:jjwt:0.6.0")
 
     // Testing framework
     testCompile 'org.springframework.boot:spring-boot-starter-test'    

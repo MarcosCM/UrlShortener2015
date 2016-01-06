@@ -3,12 +3,14 @@ package urlshortener2015.heatwave.utils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.google.api.Google;
 import org.springframework.social.twitter.api.Twitter;
 
 public class ApiBindingUtils {
-
+	
 	/**
 	 * Gets the Facebook user email
 	 * @param facebook Spring Social Facebook object
@@ -40,5 +42,43 @@ public class ApiBindingUtils {
 	 */
 	public static String getGoogleEmail(Google google){
 		return google.plusOperations().getGoogleProfile().getAccountEmail();
+	}
+	
+	/**
+	 * Gets the API that the user has been authenticated through
+	 * @return API id
+	 */
+	public static String getAuthThrough(ConnectionRepository connectionRepository){
+		if (SecurityContextHolder.getContext().getAuthentication() != null){
+			if (!connectionRepository.findConnections(Twitter.class).isEmpty()){
+				return "twitter";
+			}
+			else if (!connectionRepository.findConnections(Facebook.class).isEmpty()){
+				return "facebook";
+			}
+			else if (!connectionRepository.findConnections(Google.class).isEmpty()){
+				return "google";
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Gets a user identifier depending on the API that they used to be authenticated
+	 * @return Identifier
+	 */
+	public static String getAuthAs(ConnectionRepository connectionRepository){
+		if (SecurityContextHolder.getContext().getAuthentication() != null){
+			if (!connectionRepository.findConnections(Twitter.class).isEmpty()){
+				return ApiBindingUtils.getTwitterUserName((Twitter) connectionRepository.getPrimaryConnection(Twitter.class).getApi());
+			}
+			else if (!connectionRepository.findConnections(Facebook.class).isEmpty()){
+				return ApiBindingUtils.getFacebookEmail((Facebook) connectionRepository.getPrimaryConnection(Facebook.class).getApi());
+			}
+			else if (!connectionRepository.findConnections(Google.class).isEmpty()){
+				return ApiBindingUtils.getGoogleEmail((Google) connectionRepository.getPrimaryConnection(Google.class).getApi());
+			}
+		}
+		return null;
 	}
 }
