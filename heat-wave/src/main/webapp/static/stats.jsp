@@ -135,8 +135,8 @@
 	</c:forEach>
 
 	<form id="fechas" action="/stats/Filtradas" method="POST">
-		<input type="date" name="desde" id="desde"  value="desde"></br>
-		<input type="date" name="hasta" id="hasta" value="hasta"></br>
+		<input type="date" name="desde" id="desde"  value="desde"><br>
+		<input type="date" name="hasta" id="hasta" value="hasta"><br>
 		<button type="button" class="btn btn btn-primary " onclick='timerPeticion()'>Filtrar</button>
 	</form>
 </body>

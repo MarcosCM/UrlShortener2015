@@ -1,17 +1,17 @@
 $(document).ready(function() {
   // Vars init
   var authUsersSel = $("#authUsers");
-  var authMethods = {gmail: {buttonId: "gmailAdd", description: "Gmail", divBg: "bg-danger"},
-                      twitter: {buttonId: "twitterAdd", description: "Twitter", divBg: "bg-info"},
-                      facebook: {buttonId: "facebookAdd", description: "Facebook", divBg: "bg-primary"}};
+  var enableAdSel = $("#enableAd");
+  var authMethods = {gmail: {buttonId: "gmailAdd", description: "Gmail", divBg: "bg-danger", method : "OAuth2"},
+                      twitter: {buttonId: "twitterAdd", description: "Twitter", divBg: "bg-info", method : "OAuth1"},
+                      facebook: {buttonId: "facebookAdd", description: "Facebook", divBg: "bg-primary", method : "OAuth2"}};
 
   // Form submit trigger
   $("#shortener").submit(function(event) {
-    if (timer != null) {
-	    clearTimeout(timer);
-	    // Remove inputs to prevent the form to send unneeded data
-	    if (authUsersSel.is(":not(:checked)")) authUsersSel.empty();
-    }
+    // Clear timer
+    if (timer != null) clearTimeout(timer);
+    // Remove inputs to prevent the form to send unneeded data
+    if (enableAdSel.is(":not(:checked)")) authUsersSel.empty();
     $.ajax({
       type : "POST",
       url : "/link",
@@ -29,12 +29,12 @@ $(document).ready(function() {
       error : function(jqXHR) {
         var obj = jQuery.parseJSON( jqXHR.responseText );
         var mensaje=obj.message;
-		if(mensaje.localeCompare("La URL a personalizar ya existe")==0 || mensaje.localeCompare("La URL a acortar no es válida")==0){
-			$("#result").html( "<div class='alert alert-danger lead'>"+mensaje+"</div>");
-	        document.getElementById("sugerencias").style.display = "inline";
-	        document.getElementById("sugerencia").style.display = "inline";
-			mostrarSugerencias();
-		}
+    		if(mensaje.localeCompare("La URL a personalizar ya existe")==0 || mensaje.localeCompare("La URL a acortar no es válida")==0){
+    			$("#result").html( "<div class='alert alert-danger lead'>"+mensaje+"</div>");
+    	        document.getElementById("sugerencias").style.display = "inline";
+    	        document.getElementById("sugerencia").style.display = "inline";
+    			mostrarSugerencias();
+    		}
         else{
 	        $("#result").html( "<div class='alert alert-danger lead'>Error de conexión</div>");
 	        document.getElementById("sugerencias").style.display = "none";
@@ -46,7 +46,7 @@ $(document).ready(function() {
   });
   
   // Enable Ad button change trigger
-  $("#enableAd").change(function(){
+  enableAdSel.change(function(){
     var elSel = $(this);
     if (elSel.is(":checked")){
       // Check whether the div hasn't been previously filled
@@ -69,14 +69,6 @@ $(document).ready(function() {
     else{
       authUsersSel.hide();
     }
-  });
-
-  // Login buttons triggers
-  $("[id$=Login]").each(function(){
-    $(this).submit(function(event){
-      $(this).attr('action', $(this).attr('action') + "/" + $("#goToUrl").val());
-      // Submit
-    });
   });
 });
 

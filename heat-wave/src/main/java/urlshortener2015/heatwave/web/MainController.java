@@ -54,6 +54,7 @@ public class MainController {
 	public static final int DEFAULT_COUNTDOWN = 10;
 	// Paths
 	public static final String DEFAULT_AD_PATH = "./images/header.png";
+	public static final String DEFAULT_HOME_PATH = "index";
 	public static final String DEFAULT_REDIRECTING_PATH = "redirecting";
 	public static final String DEFAULT_STATS_PATH = "stats";
 	public static final String DEFAULT_ERROR_PATH = "error";
@@ -143,7 +144,7 @@ public class MainController {
 		return new ResponseEntity<>(lista, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}+/json", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id:(?!link|!stadistics|!error||index).*}+/json", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectToEstadisticasJson(@PathVariable String id, HttpServletRequest request) {
 		logger.info("Requested redirection with hash " + id);
 		ShortURL l = shortURLRepository.findByHash(id);

@@ -21,7 +21,6 @@ public class ConsumeSOAPWS {
 	@Async
 	@Scheduled(fixedRate=T*1000)
 	public void consumeWS(){
-		
 		URLSTested response = redirectionTesterRequester.requestTestURLS();
 	}
 }
