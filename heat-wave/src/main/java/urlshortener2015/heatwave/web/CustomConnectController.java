@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.GenericTypeResolver;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactory;
@@ -37,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.view.RedirectView;
+
+import urlshortener2015.heatwave.utils.ApiBindingUtils;
 
 /*
  * Overrides default ConnectController
@@ -86,27 +87,26 @@ public class CustomConnectController extends ConnectController {
 	public RedirectView oauth1Callback(@PathVariable String providerId, NativeWebRequest request) {
 		connectSupport = new ConnectSupport(sessionStrategy);
 		try {
-			OAuth1ConnectionFactory<?> connectionFactory = (OAuth1ConnectionFactory<?>) connectionFactoryLocator
-					.getConnectionFactory(providerId);
+			OAuth1ConnectionFactory<?> connectionFactory = (OAuth1ConnectionFactory<?>) connectionFactoryLocator.getConnectionFactory(providerId);
 			Connection<?> connection = connectSupport.completeConnection(connectionFactory, request);
-			Serializable userProfile = null;
+			Serializable userId = null;
 			switch (providerId) {
 				case "google":
 					google = (Google) connection.getApi();
-					userProfile = google.plusOperations().getGoogleProfile().toString();
+					userId = ApiBindingUtils.getId(google);
 					break;
 				case "facebook":
 					facebook = (Facebook) connection.getApi();
-					userProfile = facebook.userOperations().getUserProfile();
+					userId = ApiBindingUtils.getId(facebook);
 					break;
 				case "twitter":
 					twitter = (Twitter) connection.getApi();
-					userProfile = twitter.userOperations().getUserProfile();
+					userId = ApiBindingUtils.getId(twitter);
 					break;
 				default:
 					break;
 			}
-			SecurityContextHolder.getContext().setAuthentication(new SocialAuthenticationToken(connection, userProfile, null, null));
+			SecurityContextHolder.getContext().setAuthentication(new SocialAuthenticationToken(connection, userId, null, null));
 			addConnection(connection, connectionFactory, request);
 		} catch (Exception e) {
 			sessionStrategy.setAttribute(request, PROVIDER_ERROR_ATTRIBUTE, e);
@@ -121,28 +121,26 @@ public class CustomConnectController extends ConnectController {
 	public RedirectView oauth2Callback(@PathVariable String providerId, NativeWebRequest request) {
 		connectSupport = new ConnectSupport(sessionStrategy);
 		try {
-			OAuth2ConnectionFactory<?> connectionFactory = (OAuth2ConnectionFactory<?>) connectionFactoryLocator
-					.getConnectionFactory(providerId);
+			OAuth2ConnectionFactory<?> connectionFactory = (OAuth2ConnectionFactory<?>) connectionFactoryLocator.getConnectionFactory(providerId);
 			Connection<?> connection = connectSupport.completeConnection(connectionFactory, request);
-			Serializable userProfile = null;
+			Serializable userId = null;
 			switch (providerId) {
 				case "google":
 					google = (Google) connection.getApi();
-					userProfile = google.plusOperations().getGoogleProfile().toString();
+					userId = ApiBindingUtils.getId(google);
 					break;
 				case "facebook":
 					facebook = (Facebook) connection.getApi();
-					userProfile = facebook.userOperations().getUserProfile();
+					userId = ApiBindingUtils.getId(facebook);
 					break;
 				case "twitter":
 					twitter = (Twitter) connection.getApi();
-					userProfile = twitter.userOperations().getUserProfile();
+					userId = ApiBindingUtils.getId(twitter);
 					break;
 				default:
 					break;
 			}
-			SecurityContextHolder.getContext()
-					.setAuthentication(new SocialAuthenticationToken(connection, userProfile, null, null));
+			SecurityContextHolder.getContext().setAuthentication(new SocialAuthenticationToken(connection, userId, null, null));
 			addConnection(connection, connectionFactory, request);
 		} catch (Exception e) {
 			sessionStrategy.setAttribute(request, PROVIDER_ERROR_ATTRIBUTE, e);

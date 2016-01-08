@@ -25,6 +25,32 @@ public class ShortURLUtils {
 	}
 	
 	/**
+	 * Checks whether the user is in the list linked to the ApiBinding
+	 * @param shortURL URL whose list the user is going to be checked
+	 * @param username Username
+	 * @return True if the user is in the list, otherwise false
+	 */
+	public static boolean isUserInList(ShortURL shortURL, String username){
+		return ShortURLUtils.isUserInLocalList(shortURL, username);
+	}
+	
+	/**
+	 * Checks whether the user is in the list linked to the ApiBinding
+	 * @param shortURL URL whose list the user is going to be checked
+	 * @param username Username
+	 * @return True if the user is in the list, otherwise false
+	 */
+	public static boolean isUserInLocalList(ShortURL shortURL, String username){
+		List<String> list = shortURL.getUsers() == null ? null : shortURL.getUsers().get("local");
+		if (list != null){
+			for(String s : list){
+				if (s.equals(username)) return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Checks whether the user is in the Facebook list
 	 * @param shortURL URL whose list the user is going to be checked
 	 * @param facebook Spring Social Facebook object

@@ -3,13 +3,26 @@ package urlshortener2015.heatwave.utils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.social.ApiBinding;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.google.api.Google;
 import org.springframework.social.twitter.api.Twitter;
 
 public class ApiBindingUtils {
+	
+	/**
+	 * Gets the identifier for a specific API
+	 * @param api Spring Social API
+	 * @return String Identifier
+	 */
+	public static String getId(ApiBinding api){
+		if (api instanceof Facebook) return ApiBindingUtils.getFacebookEmail((Facebook) api);
+		else if (api instanceof Twitter) return ApiBindingUtils.getTwitterUserName((Twitter) api);
+		else if (api instanceof Google) return ApiBindingUtils.getGoogleEmail((Google) api);
+		else return null;
+	}
 	
 	/**
 	 * Gets the Facebook user email
@@ -45,11 +58,13 @@ public class ApiBindingUtils {
 	}
 	
 	/**
-	 * Gets the API that the user has been authenticated through
-	 * @return API id
+	 * Gets the API name that the user has been authenticated through
+	 * @param securityContext Security Context
+	 * @param connectionRepository Connection Repository
+	 * @return API name if authed with a social API, otherwise null
 	 */
-	public static String getAuthThrough(ConnectionRepository connectionRepository){
-		if (SecurityContextHolder.getContext().getAuthentication() != null){
+	public static String getAuthThrough(SecurityContext securityContext, ConnectionRepository connectionRepository){
+		if (securityContext.getAuthentication() != null){
 			if (!connectionRepository.findConnections(Twitter.class).isEmpty()){
 				return "twitter";
 			}
@@ -65,20 +80,20 @@ public class ApiBindingUtils {
 	
 	/**
 	 * Gets a user identifier depending on the API that they used to be authenticated
-	 * @return Identifier
+	 * @param securityContext Security Context
+	 * @param connectionRepository Connection Repository
+	 * @return API identifier if authed with a social API, otherwise null
 	 */
-	public static String getAuthAs(ConnectionRepository connectionRepository){
-		if (SecurityContextHolder.getContext().getAuthentication() != null){
-			if (!connectionRepository.findConnections(Twitter.class).isEmpty()){
+	public static String getAuthAs(SecurityContext securityContext, ConnectionRepository connectionRepository){
+		switch(ApiBindingUtils.getAuthThrough(securityContext, connectionRepository)){
+			case "twitter":
 				return ApiBindingUtils.getTwitterUserName((Twitter) connectionRepository.getPrimaryConnection(Twitter.class).getApi());
-			}
-			else if (!connectionRepository.findConnections(Facebook.class).isEmpty()){
+			case "facebook":
 				return ApiBindingUtils.getFacebookEmail((Facebook) connectionRepository.getPrimaryConnection(Facebook.class).getApi());
-			}
-			else if (!connectionRepository.findConnections(Google.class).isEmpty()){
+			case "google":
 				return ApiBindingUtils.getGoogleEmail((Google) connectionRepository.getPrimaryConnection(Google.class).getApi());
-			}
+			default:
+				return null;
 		}
-		return null;
 	}
 }
