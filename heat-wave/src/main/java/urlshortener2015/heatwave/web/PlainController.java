@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,16 +24,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpClientErrorException;
 
 import urlshortener2015.heatwave.entities.Click;
 import urlshortener2015.heatwave.entities.DetailedStats;
 import urlshortener2015.heatwave.entities.ShortURL;
-import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
-import urlshortener2015.heatwave.utils.ApiBindingUtils;
 import urlshortener2015.heatwave.utils.ClickUtils;
 import urlshortener2015.heatwave.utils.HttpServletRequestUtils;
+import urlshortener2015.heatwave.utils.SecurityContextUtils;
 
 @Controller
 public class PlainController {
@@ -59,8 +60,10 @@ public class PlainController {
 	 */
 	@RequestMapping(value = "/")
 	public String homePage(HttpServletRequest request, Model model){
-		model.addAttribute("authThrough", ApiBindingUtils.getAuthThrough(connectionRepository));
-		model.addAttribute("authAs", ApiBindingUtils.getAuthAs(connectionRepository));
+		model.addAttribute("authThrough", SecurityContextUtils.getAuthThrough(SecurityContextHolder.getContext(), connectionRepository));
+		model.addAttribute("authAs", SecurityContextUtils.getAuthAs(SecurityContextHolder.getContext(), connectionRepository));
+		logger.info("authThrough: " + (String) model.asMap().get("authThrough"));
+		logger.info("authAs: " + (String) model.asMap().get("authAs"));
 		return MainController.DEFAULT_HOME_PATH;
 	}
 	
@@ -82,13 +85,13 @@ public class PlainController {
 					HttpServletRequestUtils.getCountry(request), clickRepository);
 			DetailedStats stats = graficoStats(id, null, null);
 			this.template.convertAndSend("/sockets/" + id, stats);
-			if (!model.containsAttribute("targetURL")) model.addAttribute("targetURL", url.getTarget());
-			if (!model.containsAttribute("countDown")) model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
-			if (!model.containsAttribute("advertisement")) model.addAttribute("advertisement", MainController.DEFAULT_AD_PATH);
-			if (!model.containsAttribute("enableAds")) model.addAttribute("enableAds", url.getAds());
+			model.addAttribute("targetURL", url.getTarget());
+			model.addAttribute("countDown", MainController.DEFAULT_COUNTDOWN);
+			model.addAttribute("advertisement", MainController.DEFAULT_AD_PATH);
+			model.addAttribute("enableAds", url.getAds());
 			return MainController.DEFAULT_REDIRECTING_PATH;
 		} else {
-			throw new Error400Response(MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);
 		}
 	}
 

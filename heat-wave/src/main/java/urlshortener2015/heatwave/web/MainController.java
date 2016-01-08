@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.google.common.hash.Hashing;
 
@@ -32,7 +33,6 @@ import urlshortener2015.heatwave.entities.BasicStats;
 import urlshortener2015.heatwave.entities.HelloMessage;
 import urlshortener2015.heatwave.entities.ShortURL;
 import urlshortener2015.heatwave.entities.Suggestion;
-import urlshortener2015.heatwave.exceptions.Error400Response;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
 import urlshortener2015.heatwave.utils.HttpServletRequestUtils;
@@ -175,19 +175,16 @@ public class MainController {
 		Map<String, List<String>> users = HttpServletRequestUtils.getUsers(request);
 		// Get ads enabling
 		Boolean ads;
-		if (enableAd != null && enableAd)
-			ads = new Boolean(true);
-		else
-			ads = new Boolean(false);
+		if (enableAd != null && enableAd) ads = new Boolean(true);
+		else ads = new Boolean(false);
 
 		if (customTag != null && !customTag.equals("")) {
 			ShortURL urlConID = shortURLRepository.findByHash(customTag);
-
 			if (urlConID != null) {
-				// la url personalizada ya existe
-				String messageError = "La URL a personalizar ya existe";
-
-				throw new Error400Response(messageError);
+				// That custom tag already exists
+				return new ResponseEntity<>(
+						new ShortURL(customTag, url, new URI(customTag), new Date(System.currentTimeMillis()), HttpStatus.TEMPORARY_REDIRECT.value(), true, enableAd, users),
+						HttpStatus.BAD_REQUEST);
 			}
 		}
 
@@ -195,12 +192,11 @@ public class MainController {
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
-			
 			return new ResponseEntity<>(su, h, HttpStatus.CREATED);
 		} else {
-			throw new Error400Response("La URL a acortar no es válida");
+			// Invalid target URL
+			return new ResponseEntity<>(su, HttpStatus.BAD_REQUEST);
 		}
-		
 	}
 
 	// A donde llega los mensajes de los sockets desde el cliente

@@ -2,9 +2,10 @@ $(document).ready(function() {
   // Vars init
   var authUsersSel = $("#authUsers");
   var enableAdSel = $("#enableAd");
-  var authMethods = {gmail: {buttonId: "gmailAdd", description: "Gmail", divBg: "bg-danger", method : "OAuth2"},
-                      twitter: {buttonId: "twitterAdd", description: "Twitter", divBg: "bg-info", method : "OAuth1"},
-                      facebook: {buttonId: "facebookAdd", description: "Facebook", divBg: "bg-primary", method : "OAuth2"}};
+  var authMethods = {local: {buttonId: "localAdd", description: "User", divBg: "bg-warning", method : "password"},
+                      gmail: {buttonId: "gmailAdd", description: "Gmail", divBg: "bg-danger", method: "OAuth2"},
+                      twitter: {buttonId: "twitterAdd", description: "Twitter", divBg: "bg-info", method: "OAuth1"},
+                      facebook: {buttonId: "facebookAdd", description: "Facebook", divBg: "bg-primary", method: "OAuth2"}};
 
   // Form submit trigger
   $("#shortener").submit(function(event) {
@@ -16,7 +17,7 @@ $(document).ready(function() {
       type : "POST",
       url : "/link",
       data : $(this).serialize(),
-      success : function(msg,status,jqXHR) {
+      success : function(msg, status, jqXHR) {
           $("#result").html(
               "<div class='alert alert-success lead'><a id='link' target='_blank' href='"
               + msg.uri
@@ -26,17 +27,17 @@ $(document).ready(function() {
               document.getElementById("sugerencias").style.display = "none";
               document.getElementById("sugerencia").style.display = "none";
       },
-      error : function(jqXHR) {
-        var obj = jQuery.parseJSON( jqXHR.responseText );
-        var mensaje=obj.message;
-    		if(mensaje.localeCompare("La URL a personalizar ya existe")==0 || mensaje.localeCompare("La URL a acortar no es válida")==0){
-    			$("#result").html( "<div class='alert alert-danger lead'>"+mensaje+"</div>");
-    	        document.getElementById("sugerencias").style.display = "inline";
-    	        document.getElementById("sugerencia").style.display = "inline";
-    			mostrarSugerencias();
-    		}
+      error : function(jqXHR, status, error) {
+        var obj = jQuery.parseJSON(jqXHR.responseText);
+        var mensaje = obj.message;
+		if(mensaje.localeCompare("La URL a personalizar ya existe")==0 || mensaje.localeCompare("La URL a acortar no es válida")==0){
+			$("#result").html( "<div class='alert alert-danger lead'>"+mensaje+"</div>");
+	        document.getElementById("sugerencias").style.display = "inline";
+	        document.getElementById("sugerencia").style.display = "inline";
+			mostrarSugerencias();
+		}
         else{
-	        $("#result").html( "<div class='alert alert-danger lead'>Error de conexión</div>");
+	        $("#result").html( "<div class='alert alert-danger lead'>" + error + "</div>");
 	        document.getElementById("sugerencias").style.display = "none";
 	        document.getElementById("sugerencia").style.display = "none";
         }
@@ -55,8 +56,8 @@ $(document).ready(function() {
         var headerContent = "<br><div id='authUsersHelp' class='col-sm-12'>Please, fill with <strong>usernames</strong> of people you don't want to view ads</div><div id='authUsersHeader' class='input-group col-sm-12'>";
         var tableContent = "";
         for(var key in authMethods){
-          headerContent += "<div class='col-sm-4 " + authMethods[key]['divBg'] + "'><label for='" + authMethods[key]['buttonId'] + "'>" + authMethods[key]['description'] + "</label><button type='button' id='" + authMethods[key]['buttonId'] + "' class='btn btn-default pull-right'><span class='glyphicon glyphicon-plus'></span></button></div>"
-          tableContent += "<div class='col-sm-4 " + authMethods[key]['divBg'] + "' id='" + key + "Container'></div>";
+          headerContent += "<div class='col-sm-3 " + authMethods[key]['divBg'] + "'><label for='" + authMethods[key]['buttonId'] + "'>" + authMethods[key]['description'] + "</label><button type='button' id='" + authMethods[key]['buttonId'] + "' class='btn btn-default pull-right'><span class='glyphicon glyphicon-plus'></span></button></div>"
+          tableContent += "<div class='col-sm-3 " + authMethods[key]['divBg'] + "' id='" + key + "Container' style='display: none'></div>";
         }
         headerContent += "</div><br>";
         authUsersSel.html(headerContent + tableContent);
@@ -75,9 +76,11 @@ $(document).ready(function() {
 function setAuthButtonsTriggers(authMethods){
   for(var key in authMethods){
     (function(k){
-      var htmlContent = "<div class='col-sm-12'><input type='text' name='users[\"" + k + "\"][]' class='" + authMethods[k]['divBg'] + "'></div>";
+      var htmlContent = "<div class='col-sm-12'><input type='text' name='users[\"" + k + "\"][]' class='" + authMethods[k]['divBg'] + " form-control'></div>";
       $("#" + authMethods[k]['buttonId']).click(function(){
-        $("#" + k + "Container").prepend(htmlContent);
+        var containerSel = $("#" + k + "Container");
+        containerSel.prepend(htmlContent);
+        containerSel.show();
       });
     })(key);
   }
