@@ -78,6 +78,17 @@ $(document).ready(function() {
       // Submit
     });
   });
+  
+  // Rules checkbox trigger
+  $("#enableRule").change(function(){
+	  	if ($(this).is(":checked")){
+			$("#rules").show();
+		}
+		else{
+			$("#rules").hide();
+			$("#rule").val("");
+		}
+  });
 });
 
 function setAuthButtonsTriggers(authMethods){
