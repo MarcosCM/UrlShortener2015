@@ -1,5 +1,7 @@
 package urlshortener2015.heatwave.web;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -65,8 +67,6 @@ public class RedirectionTesterWS {
 						break;
 					}
 					else if (conn.getResponseCode() / 100 == 3){
-						// Si el codigo es un 3xx
-						logger.info("redirection 300: " + urlTarget);
 						//Alcanzado el limite de redirecciones.
 						if(i == NUM_MAX_REDIRECCIONES-1){
 							shortURLRepository.mark(url, false);
@@ -82,8 +82,14 @@ public class RedirectionTesterWS {
 					// Si el codigo no es un 3xx no es redireccion
 					else{
 						// Si la URL estaba como no correcta en la base de datos se activa.
-						shortURLRepository.mark(url, true);
-						logger.info(url.getTarget() + " -> correcta");
+						if(executeRules(url)){
+							shortURLRepository.mark(url, true);
+							logger.info(url.getTarget() + " -> correcta");
+						}
+						else{
+							shortURLRepository.mark(url, false);
+							logger.info(url.getTarget() + " -> incorrecta, reglas fallan.");
+						}
 						conn.disconnect();
 						break;
 					}
@@ -96,5 +102,27 @@ public class RedirectionTesterWS {
 		}
 		
 		return respuesta;
+	}
+	
+	private boolean executeRules(ShortURL url){
+		boolean res = true;
+		
+		String rules[] = null;
+		if(url.getRules().isEmpty()) return true;
+		url.getRules().entrySet().toArray(rules);
+		for (String rule : rules){
+			Process p;
+			try{
+				String [] cmd = {rule, url.getTarget()};
+				p = Runtime.getRuntime().exec(cmd);
+			    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			    String s = br.readLine();
+			    return Boolean.parseBoolean(s);
+			}catch (Exception e){
+				return false;
+			}
+		}
+		
+		return res;
 	}
 }

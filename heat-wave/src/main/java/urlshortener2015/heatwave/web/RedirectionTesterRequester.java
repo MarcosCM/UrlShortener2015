@@ -29,6 +29,7 @@ public class RedirectionTesterRequester extends WebServiceGatewaySupport{
 			else logger.info("SOAP failed! in testing URLs");
 		}catch(Exception e){
 			logger.info("SOAP failed! in testing URLs:\n" + e.getMessage());
+			e.printStackTrace();
 		}
 		return response;
 	}

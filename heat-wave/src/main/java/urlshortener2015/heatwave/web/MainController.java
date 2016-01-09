@@ -84,11 +84,12 @@ public class MainController {
 	 * @param ads Enable/Disable advertisements
 	 * @param users List of users authorized not to see advertisements
 	 * @param shortURLRepository Shortened URLs repository
+	 * @param rule 
 	 * @return Shortened URL if success, otherwise error
 	 * @throws URISyntaxException
 	 * @throws MalformedURLException
 	 */
-	public static ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads, Map<String, List<String>> users, ShortURLRepository shortURLRepository)
+	public static ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads, Map<String, List<String>> users, ShortURLRepository shortURLRepository, String rule)
 					throws MalformedURLException, URISyntaxException {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
@@ -100,6 +101,7 @@ public class MainController {
 			// Si ya existe devolver null
 			ShortURL su = new ShortURL(id, url, new URI(id), new Date(System.currentTimeMillis()),
 					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads, users);
+			su.addRule(rule);
 			return shortURLRepository.insert(su);
 		} else {
 			return null;
@@ -168,7 +170,8 @@ public class MainController {
 	@RequestMapping(value = "/link", method = RequestMethod.POST)
 	public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
 			@RequestParam(value = "customTag", required = false) String customTag,
-			@RequestParam(value = "enableAd", required = false) Boolean enableAd, HttpServletRequest request)
+			@RequestParam(value = "enableAd", required = false) Boolean enableAd,
+			@RequestParam(value = "rule", required = false) String rule, HttpServletRequest request)
 					throws MalformedURLException, URISyntaxException {
 		logger.info("Requested new short for uri " + url);
 		// Get users array
@@ -188,7 +191,7 @@ public class MainController {
 			}
 		}
 
-		ShortURL su = MainController.createAndSaveIfValid(url, customTag, ads, users, shortURLRepository);
+		ShortURL su = MainController.createAndSaveIfValid(url, customTag, ads, users, shortURLRepository, rule);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());

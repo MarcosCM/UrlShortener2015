@@ -128,6 +128,19 @@
 							<div id="sugerencia"></div>
 							<div id="sugerencias" class="btn-group" role="group" /></div>
 						</div>
+						<br>
+						<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+							<div class="input-group">
+						 		<span class="input-group-addon">
+						 			<input type="checkbox" aria-label="..." name="enableRule" id="enableRule">
+						 		</span>
+						 		<input readonly type="text" class="form-control" value="Add a rule to prove the URL correction">
+						 	</div>
+					  	</div>
+						<br>
+						<div id="rules" style="display: none" class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+							<textarea id="rule" rows="6" cols="30" name="rule" placeholder="Introduce a script"></textarea>
+						</div>
 					</form>
 				</div>
 			</div>
