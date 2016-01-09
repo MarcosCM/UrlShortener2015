@@ -71,6 +71,17 @@ $(document).ready(function() {
       authUsersSel.hide();
     }
   });
+  
+  // Rules checkbox trigger
+  $("#enableRule").change(function(){
+	  	if ($(this).is(":checked")){
+			 $("#rules").show();
+  		}
+  		else{
+			 $("#rules").hide();
+		   $("#rule").val("");
+  		}
+  });
 });
 
 function setAuthButtonsTriggers(authMethods){

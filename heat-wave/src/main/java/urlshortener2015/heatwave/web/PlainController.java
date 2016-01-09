@@ -171,6 +171,7 @@ public class PlainController {
 		DetailedStats detailedStats = new DetailedStats(url, charts);
 		return detailedStats;
 	}
+	
 	/*
 	 * La clase Date de Java esta deprecada, asi que se necesita este metodo
 	 */
@@ -189,4 +190,19 @@ public class PlainController {
 	public static Date asDate(LocalDate localDate) {
 		return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 	}
+	
+	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}/rules", method = RequestMethod.GET)
+	public String redirectToRules(@PathVariable String id, HttpServletRequest request, Model model) {
+		String respuesta = "rules";
+		logger.info("Requested redirection with hash " + id);
+		ShortURL l = shortURLRepository.findByHash(id);
+		if (l != null) {
+			model.addAttribute("reglas", l.getRules());
+			model.addAttribute("url_id", id);
+			return respuesta;
+		} else {
+			throw new Error400Response(MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);
+		}
+	}
+
 }
