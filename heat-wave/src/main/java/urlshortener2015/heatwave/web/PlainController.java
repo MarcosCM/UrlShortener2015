@@ -91,7 +91,7 @@ public class PlainController {
 			model.addAttribute("enableAds", url.getAds());
 			return MainController.DEFAULT_REDIRECTING_PATH;
 		} else {
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);
+			throw new HttpClientErrorException(HttpStatus.NOT_FOUND, MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);
 		}
 	}
 
@@ -201,7 +201,7 @@ public class PlainController {
 			model.addAttribute("url_id", id);
 			return respuesta;
 		} else {
-			throw new Error400Response(MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);
+			throw new HttpClientErrorException(HttpStatus.NOT_FOUND, MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);
 		}
 	}
 

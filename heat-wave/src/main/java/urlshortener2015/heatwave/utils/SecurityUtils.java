@@ -6,6 +6,14 @@ import java.security.NoSuchAlgorithmException;
 
 public class SecurityUtils {
 
+	/**
+	 * Gets the hashed string of a text, using the SHA-512 algorithm
+	 * @param text Text to hash
+	 * @return Hashed string
+	 * 
+	 * @author <a href="https://github.com/teruyi/UrlShortener2015/tree/master/bangladesh-green">Bangladesh-green</a>
+	 * @see <a href="https://github.com/teruyi/UrlShortener2015/blob/master/bangladesh-green/src/main/java/urlshortener/bangladeshgreen/secure/Hash.java#L14">Original method</a>
+	 */
     public static String hashSHA512(String text) {
         MessageDigest md;
         String response = null;
