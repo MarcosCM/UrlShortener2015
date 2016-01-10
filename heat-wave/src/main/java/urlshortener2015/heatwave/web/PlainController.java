@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -196,6 +197,40 @@ public class PlainController {
 		String respuesta = "rules";
 		logger.info("Requested redirection with hash " + id);
 		ShortURL l = shortURLRepository.findByHash(id);
+		if (l != null) {
+			model.addAttribute("reglas", l.getRules());
+			model.addAttribute("url_id", id);
+			return respuesta;
+		} else {
+			throw new HttpClientErrorException(HttpStatus.NOT_FOUND, MainController.DEFAULT_URL_NOT_FOUND_MESSAGE);
+		}
+	}
+	
+	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}/update_rules", method = RequestMethod.POST)
+	public String updateRules(@PathVariable String id, HttpServletRequest request, Model model) {
+		String respuesta = "rules";
+		logger.info("Requested redirection with hash " + id);
+		ShortURL l = shortURLRepository.findByHash(id);
+
+		Enumeration<String> e = request.getParameterNames();
+		while(e.hasMoreElements()){
+			String nameAtr = e.nextElement();
+			
+			logger.info(nameAtr + "\n" + nameAtr.substring(0, nameAtr.indexOf("_")) + "\n" + nameAtr.substring(nameAtr.indexOf("_") + 1, nameAtr.length()));
+			// Si es un checkbox
+			if(nameAtr.substring(0, nameAtr.indexOf("_")).equals("delete")){
+				Object o = request.getParameter(nameAtr);
+				if(o != null && (boolean)o)
+					l.deleteRule(Integer.parseInt(nameAtr.substring(nameAtr.indexOf("_") + 1, nameAtr.length())));
+			}
+			
+			// Si es un textarea de reglas modificadas
+			else if(nameAtr.substring(0, nameAtr.indexOf("_")).equals("rule")){
+				String script = (String) request.getParameter(nameAtr);
+				if(script != null && !script.equals("") && !script.equals(" "))
+					l.modifyRule(Integer.parseInt(nameAtr.substring(nameAtr.indexOf("_") + 1, nameAtr.length())), script);
+			}
+		}
 		if (l != null) {
 			model.addAttribute("reglas", l.getRules());
 			model.addAttribute("url_id", id);
