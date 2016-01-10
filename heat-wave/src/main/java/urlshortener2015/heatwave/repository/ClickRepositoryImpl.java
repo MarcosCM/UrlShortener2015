@@ -1,6 +1,7 @@
 package urlshortener2015.heatwave.repository;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,10 +31,9 @@ public class ClickRepositoryImpl implements ClickRepositoryCustom {
 	private MongoTemplate mongoTemplate;
 	
 	@Override
-	public Map<String, Map<String, Integer>> aggregateInfoByHash(String hash) {
+	public Map<String, Map<String, Integer>> aggregateInfoByHash(String hash, Date from, Date to){
 		Map<String, Map<String, Integer>> res = new HashMap<String, Map<String, Integer>>();
 		
-		logger.info("Requested mapReduce for hash: " + hash);
 		// Read functions from files
 		String mapFunction = null, reduceFunction = null;
 		try {
@@ -45,6 +45,8 @@ public class ClickRepositoryImpl implements ClickRepositoryCustom {
 		// Query the data => input of the map function
 		DBObject query = new BasicDBObject();
 		query.put("hash", new BasicDBObject("$eq", hash));
+		if (from != null) query.put("date", new BasicDBObject("$gte", from));
+		if (to != null) query.put("date", new BasicDBObject("$lte", to));
 		// Execute Map-Reduce
 		DBCollection collection = mongoTemplate.getDb().getCollection(ClickRepositoryImpl.collection);
 		MapReduceCommand cmd = new MapReduceCommand(collection, mapFunction, reduceFunction, null, MapReduceCommand.OutputType.INLINE, query);
@@ -66,5 +68,10 @@ public class ClickRepositoryImpl implements ClickRepositoryCustom {
 		}
 		
 		return res;
+	}
+	
+	@Override
+	public Map<String, Map<String, Integer>> aggregateInfoByHash(String hash) {
+		return aggregateInfoByHash(hash, null, null);
 	}
 }

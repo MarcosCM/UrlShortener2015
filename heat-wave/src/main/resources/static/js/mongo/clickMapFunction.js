@@ -5,7 +5,7 @@ function clickMapFunction(){
 		var rounded = 1000 * 60 * 5;
 		var date = new Date(this["date"]);
 		// use Math.floor or Math.trunc to truncate the date, as dates are always positive
-		emit("date", new Date(Math.floor(date.getTime() / rounded) * rounded));
+		emit("date", new Date(Math.ceil(date.getTime() / rounded) * rounded));
 	}
 	else emit("date", "unknown");
 	emit("country", this.hasOwnProperty("country") ? this["country"] : "unknown");

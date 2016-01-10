@@ -16,14 +16,14 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-offset-4 col-sm-offset-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
-				<form action="/${url_id}/update_rules" method="POST">
+				<form action="/${urlId}/update_rules" method="POST">
 					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="text-align: center">
 						<button class="btn btn-lg btn-primary" type="submit">Update Rules!</button>
 					</div>
 					<c:forEach items="${reglas}" var="entry" varStatus="loop">
 						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 							<div id="rule_${entry.key}_container">
-								<p class="lead">${url_id}/${entry.key}</p>
+								<p class="lead">${urlId}/${entry.key}</p>
 								<div class="row">
 									<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
 										<textarea id="rule_${entry.key}" rows="6" cols="30" name="rule_${entry.key}">${entry.value}</textarea>

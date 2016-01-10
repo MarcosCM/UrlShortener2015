@@ -29,14 +29,12 @@ import com.google.common.hash.Hashing;
 
 import urlshortener2015.heatwave.entities.Click;
 import urlshortener2015.heatwave.entities.BasicStats;
-import urlshortener2015.heatwave.entities.HelloMessage;
 import urlshortener2015.heatwave.entities.ShortURL;
 import urlshortener2015.heatwave.entities.Suggestion;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
 import urlshortener2015.heatwave.utils.HttpServletRequestUtils;
 import urlshortener2015.heatwave.utils.SuggestionUtils;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 
 @RestController
 public class MainController {
@@ -199,12 +197,5 @@ public class MainController {
 			// Invalid target URL
 			return new ResponseEntity<>(su, HttpStatus.BAD_REQUEST);
 		}
-	}
-
-	// A donde llega los mensajes de los sockets desde el cliente
-	@MessageMapping("/stadistics")
-	// @SendTo("/sockets/IDPARAMANDAR")
-	public BasicStats respuestaSocket(HelloMessage infoQueLlega) throws Exception {
-		return new BasicStats(new Long(1), "", "");
 	}
 }
