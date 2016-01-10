@@ -10,8 +10,8 @@ function connect() {
   stompClient.connect({}, function(frame) {
     setConnected(true);
     console.log('Connected: ' + frame);
-    //lo que haces aqui es subscribirte, los mensajes destnados a /sockets/urlID
-    //se duplican y llegan automaticamente a todos lso subscritos
+    //lo que haces aqui es subscribirte, los mensajes destinados a /sockets/urlID
+    //se duplican y llegan automaticamente a todos los subscritos
     var urlActual= document.URL.split("/");
     var idActual=urlActual[3].substring(0, urlActual[3].length-1);
     var subscripcion='/sockets/'+idActual;
@@ -27,6 +27,6 @@ function connect() {
 }
 
 function sendInformation() {
-  //si se necesita eniar informacion por socket
+  //si se necesita enviar informacion por socket
   stompClient.send("/app/stadistics", {}, JSON.stringify({ 'name': 'esto es lo que se en manda en Json' }));
 }
