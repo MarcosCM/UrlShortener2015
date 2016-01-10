@@ -58,10 +58,10 @@ public class HttpServletRequestUtils {
 			if (userAgent.matches(".*opera.*")) return "Opera";
 			else if (userAgent.matches(".*edge.*")) return "Microsoft Edge";
 			else if (userAgent.matches(".*chromium.*")) return "Chromium";
-			else if (userAgent.matches(".*safari.*")) return "Safari";
+			else if (userAgent.matches(".*chrome.*")) return "Chrome";
 			else if (userAgent.matches(".*explorer.*")) return "Internet Explorer";
 			else if (userAgent.matches(".*firefox.*")) return "Firefox";
-			else if (userAgent.matches(".*chrome.*")) return "Chrome";
+			else if (userAgent.matches(".*safari.*")) return "Safari";
 			else return "Unknown";
 		}
 		else return null;

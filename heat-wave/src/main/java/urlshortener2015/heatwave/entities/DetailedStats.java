@@ -50,4 +50,43 @@ public class DetailedStats {
 	public Map<String, ChartData> getCharts(){
 		return charts;
 	}
+	
+	public String asJSON(){
+		String res = "";
+		
+		// Id
+		res += "{ 'id' : '" + this.getShortURL().getHash() + "', ";
+		// Charts
+		res += "'charts' : {";
+		
+		for(Map.Entry<String, ChartData> chart : this.getCharts().entrySet()){
+			res += "'" + chart.getKey() + "' : {";
+			
+			// Data
+			res += "'data' : {";
+			for(Map.Entry<String, Integer> chartData : chart.getValue().getData().entrySet()){
+				res += "'" + chartData.getKey() + "' : " + chartData.getValue() + ", ";
+			}
+			res.substring(0, res.lastIndexOf(','));
+			res += " }, ";
+			
+			// Options
+			res += "'options' : {";
+			for(Map.Entry<String, String> chartData : chart.getValue().getOptions().entrySet()){
+				res += "'" + chartData.getKey() + "' : '" + chartData.getValue() + "', ";
+			}
+			res.substring(0, res.lastIndexOf(','));
+			res += " }, ";
+			
+			// Type
+			res += "'type' : '" + chart.getValue().getType() + "'";
+			
+			res += " }, ";
+		}
+		res.substring(0, res.lastIndexOf(','));
+		
+		res += " }";
+		res += " }";
+		return res;
+	}
 }

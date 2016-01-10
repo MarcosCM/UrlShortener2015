@@ -18,126 +18,133 @@
 		// Load the Visualization API and the piechart package.
 		google.load('visualization', '1', {'packages':['corechart']});
 		// Set a callback to run when the Google Visualization API is loaded.
-		google.setOnLoadCallback(drawChart);
+		google.setOnLoadCallback(drawCharts);
 
-		function drawChart(){
-			<%--
-			The code gets bigger and bigger when the number of charts to be displayed gets increased
-			ToDo Improvement: turn the JSTL loop into a JavaScript loop, so the code sent to the client
-			is always the same (its size does not change) and does not get bigger
-			--%>
-			<c:forEach items="${detailedStats.getCharts()}" var="outerEntry" varStatus="outerLoop">
-			var data_${outerEntry.key} = new google.visualization.DataTable();
-			data_${outerEntry.key}.addColumn('string', 'Name');
-			data_${outerEntry.key}.addColumn('number', 'Quantity');
-			data_${outerEntry.key}.addRows([
-				<c:forEach items="${outerEntry.value.getData()}" var="dataEntry" varStatus="dataLoop">
-				['${dataEntry.key}', ${dataEntry.value}]<c:if test="${!dataLoop.last}">,</c:if>
-				</c:forEach>
-			]);
+		// Charts params
+		var charts_data = [];
+		var charts_options = [];
+		var charts_chart = [];
+		// Initial charts data JSON
+		var detailedStatsJSON = ${detailedStatsJSON}['charts'];
+		function drawCharts(){
+			for(var outer_key in detailedStatsJSON){
+				(function(i){
+					// Set data
+					charts_data[i] = new google.visualization.DataTable();
+					charts_data[i].addColumn('string', 'Name');
+					charts_data[i].addColumn('number', 'Quantity');
+					var rows = [];
+					for(var inner_data_key in detailedStatsJSON[i]['data']){
+						(function(j){
+							rows.push([j, detailedStatsJSON[i]['data'][j]]);
+						})(inner_data_key);
+					}
+					charts_data[i].addRows(rows);
 
-			var options_${outerEntry.key} = {
-			<c:forEach items="${outerEntry.value.getOptions()}" var="optionsEntry" varStatus="optionsLoop">
-				'${optionsEntry.key}': '${optionsEntry.value}'<c:if test="${!optionsLoop.last}">,</c:if>
-			</c:forEach>
-			};
+					// Set options
+					for(var inner_options_key in detailedStatsJSON[i]['options']){
+						charts_options[i] = [];
+						(function(j){
+							charts_options[i][j] = detailedStatsJSON[i]['options'][j];
+						})(inner_options_key);
+					}
 
-			var chart_${outerEntry.key} = new google.visualization.${outerEntry.value.getType()}(document.getElementById('chart_${outerEntry.key}'));
-			chart_${outerEntry.key}.draw(data_${outerEntry.key}, options_${outerEntry.key});
-			</c:forEach>
+					// Set type
+					switch(detailedStatsJSON[i]['type']){
+						case "PieChart":
+							charts_chart[i] = new google.visualization.PieChart(document.getElementById('chart_'+i));
+							break;
+						case "LineChart":
+							charts_chart[i] = new google.visualization.LineChart(document.getElementById('chart_'+i));
+							break;
+						case "BarChart":
+							charts_chart[i] = new google.visualization.BarChart(document.getElementById('chart_'+i));
+							break;
+						default:
+							charts_chart[i] = new google.visualization.PieChart(document.getElementById('chart_'+i));
+							break;
+					}
+
+					// Draw chart
+					charts_chart[i].draw(charts_data[i], charts_options[i]);
+				})(outer_key);
+			}
 		}
 
 		var stompClient = null;
-		function connect() {
-			var socket = new SockJS('/stadistics');
+		var socket = null;
+		$(document).on('ready', function(){
+			socket = new SockJS('/statistics');
 			stompClient = Stomp.over(socket);
+			stompClient.debug = null;
 			stompClient.connect({}, function(frame) {
-				console.log('Connected: ' + frame);
-				//lo que haces aqui es subscribirte, los mensajes destinados a /sockets/urlID
-				//se duplican y llegan automaticamente a todos los subscritos
-				var urlActual= document.URL.split("/");
-				var idActual=urlActual[3].substring(0, urlActual[3].length-1);
-				var subscripcion='/sockets/'+idActual;
+				// Subscribe to the shortened URL socket
+				var subscripcion = '/sockets/${hash}';
 				stompClient.subscribe(subscripcion, function(stats){
-						if ((document.getElementById("hasta").value.localeCompare('')==0 && document.getElementById("desde").value.localeCompare('')==0) ||
-							(document.getElementById("hasta").value==null && document.getElementById("desde").value==null)){
-							//si los valor desde y hasta no tienen filtros->
-							console.log("no hay filtros puestos");
-					    	var charts = JSON.parse(stats.body).charts;
-							console.log(charts);
-							drawOne(charts);
-						}
+					// Refresh charts on data receipt
+					refreshCharts(JSON.parse(stats.body));
 				});
 		  	});
-		}
 
-		function sendInformation() {
-		  	//si se necesita eniar informacion por socket
-			stompClient.send("/app/stadistics", {}, JSON.stringify({ 'name': 'esto es lo que se en manda en Json' }));
-		}
-
-		var timer;
-		function timerPeticion(){
-			if (timer != null){
-				clearTimeout(timer);
+			var timer;
+			function resetTimer(){
+				if (timer != null) clearTimeout(timer);
+				timer = setInterval(peticionFiltrada, 5000);
 			}
-			timer = setInterval(peticionFiltrada, 5000);
-		}
+			resetTimer();
+
+		  	$("#filterButton").click(function(){
+				resetTimer();
+		  	});
+		});
 
 		function peticionFiltrada(){
-			console.log("peticion");
-			if(!((document.getElementById("hasta").value.localeCompare('')==0 && document.getElementById("desde").value.localeCompare('')==0) ||
-				( document.getElementById("hasta").value==null && document.getElementById("desde").value==null))){
-				console.log("hay algun filtro puesto");
-				var urlActual = document.URL.split("/");
-				var idActual = urlActual[3].substring(0, urlActual[3].length-1);
-			    $.get("/stats/Filtradas", { id: idActual,
-		    		desde: document.getElementById("desde").value, hasta: document.getElementById("hasta").value
-		    	})
-		       	.done(function(data) {
-					console.log("ajax bien");
-					drawOne(data.charts);
-		      	})
-		      	.fail(function(data){
-			    	console.log("ajax mal");
-		      	});
-			}
-			else{
-				console.log("no hay filtros puestos");
-			}
+			var from = $("#from").val();
+			var to = $("#to").val();
+			stompClient.send("/app/statistics", {}, JSON.stringify({ 'id' : '${hash}',
+																	'from' : from,
+																	'to' : to
+																}));
 		}
 
-		function drawOne(charts){
-			for(var key in charts){
-				console.log(key);
-				console.log(charts.Browser.data);
-				var chart = new google.visualization.PieChart(document.getElementById('chart_'+key));
-				var data = new google.visualization.DataTable();
-				data.addColumn('string', 'Name');
-				data.addColumn('number', 'Quantity');
-				var array = $.map(charts.Browser.data, function(value, index){
-					return [value];
-				});
-				var i = 0;
-				for(var element in charts.Browser.data){
-					data.addRow([element, array[i]]);
-					i = i+1;
+		function refreshCharts(updated_charts_data){
+			for(var i in updated_charts_data){
+				charts_data[i] = new google.visualization.DataTable();
+				charts_data[i].addColumn('string', 'Name');
+				charts_data[i].addColumn('number', 'Quantity');
+				var rows = [];
+				for(var inner_data_key in updated_charts_data[i]){
+					(function(j){
+						rows.push([j, updated_charts_data[i][j]]);
+					})(inner_data_key);
 				}
-				chart.draw(data, charts.Browser.options);
+				charts_data[i].addRows(rows);
+				charts_chart[i].draw(charts_data[i], charts_options[i]);
 			}
 		}
-
 	</script>
 </head>
-<body onload="connect()">
+<body>
 	<c:forEach items="${detailedStats.getCharts()}" var="entry" varStatus="loop">
 	<div id="chart_${entry.key}"></div>
 	</c:forEach>
 
-	<form id="fechas" action="/stats/Filtradas" method="POST">
-		<input type="date" name="desde" id="desde"  value="desde"><br>
-		<input type="date" name="hasta" id="hasta" value="hasta"><br>
-		<button type="button" class="btn btn btn-primary " onclick='timerPeticion()'>Filtrar</button>
-	</form>
+	<div class="row">
+		<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+			<div class="input-group">
+				<span id="fromLabel" class="input-group-addon">From date</span>
+				<input type="date" class="form-control" id="from" name="from" placeholder="dd/mm/yyyy">
+			</div>
+		</div>
+		<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+			<div class="input-group">
+				<span id="fromLabel" class="input-group-addon">To date</span>
+				<input type="date" class="form-control" id="to" name="to" placeholder="dd/mm/yyyy">
+			</div>
+		</div>
+		<div class="input-group input-group-lg col-sm-offset-4 col-sm-4" style="text-align: center">
+			<button id="filterButton" type="button" class="btn btn btn-primary">Filter</button>
+		</div>
+	</div>
 </body>
 </html>

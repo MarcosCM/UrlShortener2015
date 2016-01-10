@@ -6,6 +6,12 @@ public class BasicStats {
 	String url;
 	String fechaCreacion;
 
+	public BasicStats(Long clicks, String url, String fechaCreacion) {
+		this.clicks = clicks;
+		this.url = url;
+		this.fechaCreacion = fechaCreacion;
+	}
+	
 	public Long getClicks() {
 		return clicks;
 	}
@@ -32,18 +38,9 @@ public class BasicStats {
 
 	@Override
 	public String toString() {
-
 		String resultado = "{Estadisticas: {clicks: \"" + clicks + 
 				"\", url: \"" + url
 				+ "\", Fecha: \"" + fechaCreacion + "\" }}";
-
 		return resultado;
-	}
-
-	public BasicStats(Long clicks, String url, String fechaCreacion) {
-		this.clicks = clicks;
-		this.url = url;
-		this.fechaCreacion = fechaCreacion;
-
 	}
 }

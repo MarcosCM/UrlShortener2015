@@ -7,7 +7,7 @@ import urlshortener2015.heatwave.entities.DetailedStats;
 import urlshortener2015.heatwave.entities.ShortURL;
 
 public class ClickUtils {
-
+	
 	/**
 	 * 
 		FROM:
