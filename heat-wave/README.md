@@ -15,7 +15,7 @@
 
 ## Features
 
-* Stats about visitors
-* Advertisements
-* Limited number of redirects and loop prevention.
-* Custom URL keyword
+* Real time stats about visitors
+* Management of advertisements
+* Loop prevention and script execution to know safeness of a URL
+* Custom URL tag/keyword
