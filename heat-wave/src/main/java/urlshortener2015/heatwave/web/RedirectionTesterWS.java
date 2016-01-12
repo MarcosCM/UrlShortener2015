@@ -107,13 +107,19 @@ public class RedirectionTesterWS {
 	private boolean executeRules(ShortURL url){
 		boolean res = true;
 		
-		String rules[] = null;
 		if(url.getRules().isEmpty()) return true;
+		String rules[] = new String[url.getRules().size()];
 		url.getRules().entrySet().toArray(rules);
+		String code;
 		for (String rule : rules){
+			code = "checkURL(){\n"
+					+ rule + "\n"
+					+ "}\n\n"
+					+ "checkURL " + url.getTarget();
+			logger.info(code);
 			Process p;
 			try{
-				String [] cmd = {rule, url.getTarget()};
+				String [] cmd = {"bash", "-c", code};
 				p = Runtime.getRuntime().exec(cmd);
 			    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			    String s = br.readLine();

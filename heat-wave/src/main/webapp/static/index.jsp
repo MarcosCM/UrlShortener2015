@@ -139,6 +139,9 @@
 					  	</div>
 						<br>
 						<div id="rules" style="display: none" class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+							<p class="lead"><strong>Only Bash scripts</strong></p>
+							<p class="lead">The inserted code will be embedded into a function</p>
+							<p class="lead">whose first param is the target URL</p>
 							<textarea id="rule" rows="6" cols="30" name="rule" placeholder="Introduce a script"></textarea>
 						</div>
 					</form>
