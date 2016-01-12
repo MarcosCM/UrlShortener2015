@@ -41,7 +41,7 @@ public class SecurityContextUtils {
 	 */
 	public static boolean isCreator(ShortURL url, SecurityContext securityContext, ConnectionRepository connectionRepository){
 		String authAs = SecurityContextUtils.getAuthAs(securityContext, connectionRepository);
-		if (authAs.equals("anonymousUser")){
+		if (!authAs.equals("anonymousUser")){
 			String authThrough = SecurityContextUtils.getAuthThrough(securityContext, connectionRepository);
 			if (url.getCreatorAuthAs() != null && url.getCreatorAuthAs().equals(authAs)
 					&& url.getCreatorAuthThrough() != null && url.getCreatorAuthThrough().equals(authThrough)) return true;
