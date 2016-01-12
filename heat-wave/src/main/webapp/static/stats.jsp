@@ -8,11 +8,11 @@
 	<!-- Google Visualization API -->
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 	<!-- JQuery -->
-	<script type="text/javascript" src="webjars/jquery/2.1.4/jquery.min.js"></script>
-	<script type="text/javascript" src="js/stomp.js"></script>
-	<script type="text/javascript" src="js/sockjs-0.3.4.js"></script>
+	<script type="text/javascript" src="/webjars/jquery/2.1.4/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/stomp.js"></script>
+	<script type="text/javascript" src="/js/sockjs-0.3.4.js"></script>
 	<!-- Bootstrap -->
-	<script type="text/javascript" src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 	<!-- Chart utils -->
 	<script type="text/javascript">
 		// Load the Visualization API and the piechart package.

@@ -8,6 +8,6 @@ import urlshortener2015.heatwave.entities.*;
 public class ShortURLFixture {
 
 	public static ShortURL someUrl() {
-		return new ShortURL("someKey", "http://example.com/", null, null, null, true, true, new HashMap<String, List<String>>());
+		return new ShortURL("someKey", "http://example.com/", null, null, null, true, true, new HashMap<String, List<String>>(), null, null);
 	}
 }

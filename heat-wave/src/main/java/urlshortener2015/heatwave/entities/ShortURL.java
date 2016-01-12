@@ -22,9 +22,13 @@ public class ShortURL {
 	private Boolean ads;
 	private Map<String, List<String>> users;
 	private Map<Integer, String> rules;
-	private int id;
+	private int scriptId;
+	/* [0] -> local/twitter/facebook/google; [1] -> anonymous/USER */
+	private String creatorAuthAs;
+	private String creatorAuthThrough;
 	
-	public ShortURL(String hash, String target, URI uri, Date date, Integer mode, Boolean safe, Boolean ads, Map<String, List<String>> users) {
+	public ShortURL(String hash, String target, URI uri, Date date, Integer mode, Boolean safe, Boolean ads, Map<String, List<String>> users,
+			String creatorAuthAs, String creatorAuthThrough) {
 		this.hash = hash;
 		this.target = target;
 		this.uri = uri;
@@ -34,7 +38,9 @@ public class ShortURL {
 		this.ads = ads;
 		this.users = users;
 		this.rules = new HashMap<Integer, String>();
-		this.id = 1;
+		this.scriptId = 1;
+		this.creatorAuthAs = creatorAuthAs;
+		this.creatorAuthThrough = creatorAuthThrough;
 	}
 
 	public ShortURL() {}
@@ -76,8 +82,8 @@ public class ShortURL {
 	}
 	
 	public void addRule(String script){
-		this.rules.put(id, script);
-		id += 1;
+		this.rules.put(scriptId, script);
+		scriptId += 1;
 	}
 	
 	public void modifyRule(int id, String script){
@@ -90,6 +96,22 @@ public class ShortURL {
 	
 	public void setSafe(Boolean safe){
 		this.safe = safe;
+	}
+
+	public String getCreatorAuthAs() {
+		return creatorAuthAs;
+	}
+
+	public void setCreatorAuthAs(String creatorAuthAs) {
+		this.creatorAuthAs = creatorAuthAs;
+	}
+	
+	public String getCreatorAuthThrough() {
+		return creatorAuthThrough;
+	}
+
+	public void setCreatorAuthThrough(String creatorAuthThrough) {
+		this.creatorAuthThrough = creatorAuthThrough;
 	}
 	
 }

@@ -19,6 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,6 +37,7 @@ import urlshortener2015.heatwave.entities.Suggestion;
 import urlshortener2015.heatwave.repository.ClickRepository;
 import urlshortener2015.heatwave.repository.ShortURLRepository;
 import urlshortener2015.heatwave.utils.HttpServletRequestUtils;
+import urlshortener2015.heatwave.utils.SecurityContextUtils;
 import urlshortener2015.heatwave.utils.SuggestionUtils;
 
 @RestController
@@ -46,6 +50,9 @@ public class MainController {
 
 	@Autowired
 	private ClickRepository clickRepository;
+	
+	@Autowired
+	private ConnectionRepository connectionRepository;
 
 	// Times
 	public static final int DEFAULT_COUNTDOWN = 10;
@@ -57,6 +64,7 @@ public class MainController {
 	public static final String DEFAULT_ERROR_PATH = "error";
 	// Error messages
 	public static final String DEFAULT_URL_NOT_FOUND_MESSAGE = "That URL does not exist";
+	public static final String DEFAULT_FORBIDDEN_ACTION = "You are not allowed to perform this action";
 
 	/**
 	 * Saves a click
@@ -86,8 +94,8 @@ public class MainController {
 	 * @throws URISyntaxException
 	 * @throws MalformedURLException
 	 */
-	public static ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads, Map<String, List<String>> users, ShortURLRepository shortURLRepository, String rule)
-					throws MalformedURLException, URISyntaxException {
+	public static ShortURL createAndSaveIfValid(String url, String customTag, Boolean ads, Map<String, List<String>> users, String rule,
+			ShortURLRepository shortURLRepository, ConnectionRepository connectionRepository) throws MalformedURLException, URISyntaxException {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
 			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
@@ -96,8 +104,10 @@ public class MainController {
 			}
 
 			// Si ya existe devolver null
+			String creatorAuthAs = SecurityContextUtils.getAuthAs(SecurityContextHolder.getContext(), connectionRepository);
+			String creatorAuthThrough = SecurityContextUtils.getAuthThrough(SecurityContextHolder.getContext(), connectionRepository);
 			ShortURL su = new ShortURL(id, url, new URI(id), new Date(System.currentTimeMillis()),
-					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads, users);
+					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads, users, creatorAuthAs, creatorAuthThrough);
 			su.addRule(rule);
 			return shortURLRepository.insert(su);
 		} else {
@@ -145,10 +155,13 @@ public class MainController {
 
 	@RequestMapping(value = "/{id:(?!link|!stadistics|!error||index).*}+/json", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectToEstadisticasJson(@PathVariable String id, HttpServletRequest request) {
-		logger.info("Requested redirection with hash " + id);
-		ShortURL l = shortURLRepository.findByHash(id);
-		if (l != null) {
-			return MainController.createSuccessfulRedirectToStatisticJson(l, clickRepository);
+		logger.info("Requested stats with hash " + id);
+		ShortURL url = shortURLRepository.findByHash(id);
+		if (url != null) {
+			// Only the creator of the shortened URL can access this section
+			SecurityContext securityContext = SecurityContextHolder.getContext();
+			if (SecurityContextUtils.isCreator(url, securityContext, connectionRepository)) return MainController.createSuccessfulRedirectToStatisticJson(url, clickRepository);
+			else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -182,13 +195,16 @@ public class MainController {
 			ShortURL urlConID = shortURLRepository.findByHash(customTag);
 			if (urlConID != null) {
 				// That custom tag already exists
+				String creatorAuthAs = SecurityContextUtils.getAuthAs(SecurityContextHolder.getContext(), connectionRepository);
+				String creatorAuthThrough = SecurityContextUtils.getAuthThrough(SecurityContextHolder.getContext(), connectionRepository);
 				return new ResponseEntity<>(
-						new ShortURL(customTag, url, new URI(customTag), new Date(System.currentTimeMillis()), HttpStatus.TEMPORARY_REDIRECT.value(), true, enableAd, users),
+						new ShortURL(customTag, url, new URI(customTag), new Date(System.currentTimeMillis()),
+								HttpStatus.TEMPORARY_REDIRECT.value(), true, enableAd, users, creatorAuthAs, creatorAuthThrough),
 						HttpStatus.BAD_REQUEST);
 			}
 		}
 
-		ShortURL su = MainController.createAndSaveIfValid(url, customTag, ads, users, shortURLRepository, rule);
+		ShortURL su = MainController.createAndSaveIfValid(url, customTag, ads, users, rule, shortURLRepository, connectionRepository);
 		if (su != null) {
 			HttpHeaders h = new HttpHeaders();
 			h.setLocation(su.getUri());
