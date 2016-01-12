@@ -4,10 +4,10 @@
 <head>
 	<title>URL Shortener</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" type="text/css" href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
-	<script type="text/javascript" src="webjars/jquery/2.1.4/jquery.min.js"></script>
-	<script type="text/javascript" src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="js/app.js"></script>
+	<link rel="stylesheet" type="text/css" href="/webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+	<script type="text/javascript" src="/webjars/jquery/2.1.4/jquery.min.js"></script>
+	<script type="text/javascript" src="/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/js/app.js"></script>
 </head>
 <body>
 	<div class="container-full">
@@ -139,6 +139,9 @@
 					  	</div>
 						<br>
 						<div id="rules" style="display: none" class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+							<p class="lead"><strong>Only Bash scripts</strong></p>
+							<p class="lead">The inserted code will be embedded into a function</p>
+							<p class="lead">whose first param is the target URL</p>
 							<textarea id="rule" rows="6" cols="30" name="rule" placeholder="Introduce a script"></textarea>
 						</div>
 					</form>

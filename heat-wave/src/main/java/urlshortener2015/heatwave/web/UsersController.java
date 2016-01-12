@@ -42,7 +42,7 @@ public class UsersController {
         else{
             User requestedUser = userRepository.findByUsername(username);
             String hashedPw = SecurityUtils.hashSHA512(password);
-            if(requestedUser!=null && requestedUser.getPassword().equals(hashedPw)){
+            if(requestedUser != null && requestedUser.getPassword().equals(hashedPw)){
             	SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, password, null));
                 return MainController.DEFAULT_HOME_PATH;
             }
