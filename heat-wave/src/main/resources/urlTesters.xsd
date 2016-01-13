@@ -13,6 +13,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="TESTED" type="xs:string"/>
+                <xs:element name="numURLs" type="xs:int"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
