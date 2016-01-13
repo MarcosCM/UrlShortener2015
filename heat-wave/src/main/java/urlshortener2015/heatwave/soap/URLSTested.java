@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="TESTED" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="numURLs" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -28,13 +29,15 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "tested"
+    "tested",
+    "numURLs"
 })
 @XmlRootElement(name = "URLSTested")
 public class URLSTested {
 
     @XmlElement(name = "TESTED", required = true)
     protected String tested;
+    protected int numURLs;
 
     /**
      * Obtiene el valor de la propiedad tested.
@@ -58,6 +61,22 @@ public class URLSTested {
      */
     public void setTESTED(String value) {
         this.tested = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad numURLs.
+     * 
+     */
+    public int getNumURLs() {
+        return numURLs;
+    }
+
+    /**
+     * Define el valor de la propiedad numURLs.
+     * 
+     */
+    public void setNumURLs(int value) {
+        this.numURLs = value;
     }
 
 }

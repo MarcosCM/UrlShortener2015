@@ -25,7 +25,7 @@ public class RedirectionTesterRequester extends WebServiceGatewaySupport{
 					"http://localhost:8081/ws",
 					request);
 			
-			if(response != null) logger.info("URLs Tested!");
+			if(response != null) logger.info(response.getNumURLs() + " URLs Tested!");
 			else logger.info("SOAP failed! in testing URLs");
 		}catch(Exception e){
 			logger.info("SOAP failed! in testing URLs:\n" + e.getMessage());

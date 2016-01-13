@@ -43,6 +43,7 @@ public class RedirectionTesterWS {
 	public URLSTested testUrls(@RequestPayload TestYourURLS request){
 		
 		URLSTested respuesta = new URLSTested();
+		respuesta.setNumURLs(0);
 		
 		HttpURLConnection.setFollowRedirects(false);
 		HttpURLConnection conn = null;
@@ -99,6 +100,8 @@ public class RedirectionTesterWS {
 					break;// Poner 404 en la base de datos
 				}
 			}
+			
+			respuesta.setNumURLs(respuesta.getNumURLs() + 1);
 		}
 		
 		return respuesta;
@@ -111,6 +114,10 @@ public class RedirectionTesterWS {
 		String rules[] = new String[url.getRules().size()];
 		url.getRules().entrySet().toArray(rules);
 		String code;
+		/*
+		 * Se obtienen todos los scripts y se comprueban uno a uno
+		 * que son correctos.
+		 */
 		for (String rule : rules){
 			code = "checkURL(){\n"
 					+ rule + "\n"
@@ -123,8 +130,10 @@ public class RedirectionTesterWS {
 				p = Runtime.getRuntime().exec(cmd);
 			    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			    String s = br.readLine();
+			    // Un script es correcto si y solo si devuelve "true".
 			    return Boolean.parseBoolean(s);
 			}catch (Exception e){
+				logger.info("Fallan reglas de URL: " + url.getTarget());
 				return false;
 			}
 		}
