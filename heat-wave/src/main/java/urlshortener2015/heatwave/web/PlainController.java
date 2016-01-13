@@ -70,8 +70,6 @@ public class PlainController {
 	public String homePage(HttpServletRequest request, Model model){
 		model.addAttribute("authThrough", SecurityContextUtils.getAuthThrough(SecurityContextHolder.getContext(), connectionRepository));
 		model.addAttribute("authAs", SecurityContextUtils.getAuthAs(SecurityContextHolder.getContext(), connectionRepository));
-		logger.info("authThrough: " + (String) model.asMap().get("authThrough"));
-		logger.info("authAs: " + (String) model.asMap().get("authAs"));
 		return MainController.DEFAULT_HOME_PATH;
 	}
 	
@@ -191,11 +189,10 @@ public class PlainController {
 			while(e.hasMoreElements()){
 				String nameAtr = e.nextElement();
 				
-				logger.info(nameAtr + "\n" + nameAtr.substring(0, nameAtr.indexOf("_")) + "\n" + nameAtr.substring(nameAtr.indexOf("_") + 1, nameAtr.length()));
 				// Si es un checkbox
 				if(nameAtr.substring(0, nameAtr.indexOf("_")).equals("delete")){
 					Object o = request.getParameter(nameAtr);
-					if(o != null && (boolean)o)
+					if(o != null && ((String) o).equals("on"))
 						url.deleteRule(Integer.parseInt(nameAtr.substring(nameAtr.indexOf("_") + 1, nameAtr.length())));
 				}
 				
@@ -206,6 +203,9 @@ public class PlainController {
 						url.modifyRule(Integer.parseInt(nameAtr.substring(nameAtr.indexOf("_") + 1, nameAtr.length())), script);
 				}
 			}
+			
+			shortURLRepository.save(url);
+			
 			model.addAttribute("reglas", url.getRules());
 			model.addAttribute("urlId", id);
 			return respuesta;
