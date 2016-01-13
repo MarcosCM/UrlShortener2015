@@ -66,10 +66,6 @@ public class MongoUsersConnectionRepository implements UsersConnectionRepository
 
     @Override
     public ConnectionRepository createConnectionRepository(final String userId) {
-    	/*for(StackTraceElement e : Thread.currentThread().getStackTrace()){
-    		logger.info(e.toString());
-    	}
-    	logger.info("FIN");*/
         checkArgument(userId != null, "userId must be defined");
         return new MongoConnectionRepository(userId, mongo, connectionFactoryLocator, mongoConnectionTransformers);
     }

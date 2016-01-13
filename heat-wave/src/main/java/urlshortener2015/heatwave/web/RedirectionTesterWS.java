@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ import urlshortener2015.heatwave.soap.URLSTested;
 @Endpoint
 public class RedirectionTesterWS {
 	
-	private static final Logger logger = LoggerFactory.getLogger(CustomConnectController.class);
+	private static final Logger logger = LoggerFactory.getLogger(RedirectionTesterWS.class);
 
 	 /* Numero maximo de redirecciones*/
 	 
@@ -71,7 +72,6 @@ public class RedirectionTesterWS {
 						//Alcanzado el limite de redirecciones.
 						if(i == NUM_MAX_REDIRECCIONES-1){
 							shortURLRepository.mark(url, false);
-							logger.info(url.getTarget() + " -> incorrecta");
 							conn.disconnect();
 							break;// Poner 404 en la base de datos
 						}
@@ -85,16 +85,15 @@ public class RedirectionTesterWS {
 						// Si la URL estaba como no correcta en la base de datos se activa.
 						if(executeRules(url)){
 							shortURLRepository.mark(url, true);
-							logger.info(url.getTarget() + " -> correcta");
 						}
 						else{
 							shortURLRepository.mark(url, false);
-							logger.info(url.getTarget() + " -> incorrecta, reglas fallan.");
 						}
 						conn.disconnect();
 						break;
 					}
 				}catch(Exception e){
+					logger.debug("Exception: " + e.getMessage());
 					shortURLRepository.mark(url, false);
 					conn.disconnect();
 					break;// Poner 404 en la base de datos
@@ -110,9 +109,8 @@ public class RedirectionTesterWS {
 	private boolean executeRules(ShortURL url){
 		boolean res = true;
 		
-		if(url.getRules().isEmpty()) return true;
-		String rules[] = new String[url.getRules().size()];
-		url.getRules().entrySet().toArray(rules);
+		if(url.getRules() == null || url.getRules().isEmpty()) return true;
+		Collection<String> rules = url.getRules().values();
 		String code;
 		/*
 		 * Se obtienen todos los scripts y se comprueban uno a uno
@@ -123,7 +121,6 @@ public class RedirectionTesterWS {
 					+ rule + "\n"
 					+ "}\n\n"
 					+ "checkURL " + url.getTarget();
-			logger.info(code);
 			Process p;
 			try{
 				String [] cmd = {"bash", "-c", code};
@@ -131,9 +128,9 @@ public class RedirectionTesterWS {
 			    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			    String s = br.readLine();
 			    // Un script es correcto si y solo si devuelve "true".
-			    return Boolean.parseBoolean(s);
+			    res &= Boolean.parseBoolean(s);
 			}catch (Exception e){
-				logger.info("Fallan reglas de URL: " + url.getTarget());
+				logger.debug("Fallan reglas de URL: " + url.getTarget());
 				return false;
 			}
 		}
