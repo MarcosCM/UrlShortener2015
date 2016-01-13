@@ -44,7 +44,7 @@ public class UsersController {
             String hashedPw = SecurityUtils.hashSHA512(password);
             if(requestedUser != null && requestedUser.getPassword().equals(hashedPw)){
             	SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, password, null));
-                return MainController.DEFAULT_HOME_PATH;
+                return "redirect:/";
             }
             else{
             	throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Incorrect user and password combination");
