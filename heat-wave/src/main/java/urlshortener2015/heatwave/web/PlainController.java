@@ -81,7 +81,7 @@ public class PlainController {
 	 * @return Redirect page
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/{id:(?!link|!stadistics|!error|index).*}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id:(?!link|!statistics|!error|index).*}", method = RequestMethod.GET)
 	public String redirectTo(@PathVariable String id, HttpServletRequest request, Model model) throws IOException {
 		logger.info("Requested redirection to statistics with hash " + id);
 		ShortURL url = shortURLRepository.findByHash(id);
@@ -129,7 +129,7 @@ public class PlainController {
 	 * @param model Model
 	 * @return Stats page
 	 */
-	@RequestMapping(value = "/{id:(?!link|!stadistics|!error|index).*}+", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id:(?!link|!statistics|!error|index).*}+", method = RequestMethod.GET)
 	public String redirectToEstadisticas(@PathVariable String id, HttpServletRequest request, Model model) {
 		logger.info("Requested stats with hash " + id);
 		ShortURL url = shortURLRepository.findByHash(id);
@@ -156,7 +156,7 @@ public class PlainController {
 	 * @param model Model
 	 * @return Rules page
 	 */
-	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}/rules", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id:(?!link|!statistics|index).*}/rules", method = RequestMethod.GET)
 	public String redirectToRules(@PathVariable String id, HttpServletRequest request, Model model) {
 		String respuesta = "rules";
 		logger.info("Requested redirection with hash " + id);
@@ -174,7 +174,7 @@ public class PlainController {
 		}
 	}
 	
-	@RequestMapping(value = "/{id:(?!link|!stadistics|index).*}/update_rules", method = RequestMethod.POST)
+	@RequestMapping(value = "/{id:(?!link|!statistics|index).*}/update_rules", method = RequestMethod.POST)
 	public String updateRules(@PathVariable String id, HttpServletRequest request, Model model) {
 		String respuesta = "rules";
 		logger.info("Requested redirection with hash " + id);

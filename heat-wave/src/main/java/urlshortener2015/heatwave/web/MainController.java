@@ -98,7 +98,7 @@ public class MainController {
 			ShortURLRepository shortURLRepository, ConnectionRepository connectionRepository) throws MalformedURLException, URISyntaxException {
 		UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 		if (urlValidator.isValid(url)) {
-			String id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
+			String id = Hashing.murmur3_32().hashString(System.currentTimeMillis() + url, StandardCharsets.UTF_8).toString();
 			if (customTag != null && !customTag.equals("")) {
 				id = customTag;
 			}
@@ -108,7 +108,7 @@ public class MainController {
 			String creatorAuthThrough = SecurityContextUtils.getAuthThrough(SecurityContextHolder.getContext(), connectionRepository);
 			ShortURL su = new ShortURL(id, url, new URI(id), new Date(System.currentTimeMillis()),
 					HttpStatus.TEMPORARY_REDIRECT.value(), true, ads, users, creatorAuthAs, creatorAuthThrough);
-			su.addRule(rule);
+			if (rule != null && !rule.equals("")) su.addRule(rule);
 			return shortURLRepository.insert(su);
 		} else {
 			return null;
@@ -153,7 +153,7 @@ public class MainController {
 		return new ResponseEntity<>(lista, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/{id:(?!link|!stadistics|!error||index).*}+/json", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id:(?!link|!statistics|!error||index).*}+/json", method = RequestMethod.GET)
 	public ResponseEntity<?> redirectToEstadisticasJson(@PathVariable String id, HttpServletRequest request) {
 		logger.info("Requested stats with hash " + id);
 		ShortURL url = shortURLRepository.findByHash(id);
