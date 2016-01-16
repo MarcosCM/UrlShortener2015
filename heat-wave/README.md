@@ -17,5 +17,12 @@
 
 * Real time stats about visitors
 * Management of advertisements
-* Loop prevention and script execution to know safeness of a URL
+* Loop prevention and script execution to check safeness of a URL
 * Custom URL tag/keyword
+
+## ToDo
+
+* Secure script execution through a user with low privileges
+* Logout button
+* Monthly stats report to all shortened URLs creators
+* (IMPL) Tests
