@@ -1,4 +1,4 @@
-# Web Engineering 2015-2016 / UrlShortener2015
+# UrlShortener2015
 [![Build Status](https://travis-ci.org/MarcosCM/UrlShortener2015.svg)](https://travis-ci.org/MarcosCM/UrlShortener2015)
 
 ## Developers
