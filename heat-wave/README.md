@@ -3,7 +3,7 @@
 
 ## Developers
 
-* [Marcos Canales Mayo](https://github.com/MarcosCM)
+* [Marcos Canales Mayo](https://github.com/MarcosCM) (project leader)
 * [Carlos Escuín Blasco](https://github.com/xarlieskin)
 * [Íñigo Alonso Ruiz](https://github.com/Shathe)
 
